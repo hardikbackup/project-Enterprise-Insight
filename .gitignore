@@ -1,0 +1,83 @@
+# Compiled output
+/dist/
+
+# Dependencies
+/node_modules/
+
+# Environment variables
+.env
+
+# Logs and data
+/logs/
+*.log
+npm-debug.log*
+
+# Caches
+*.cache/
+
+# Test build output
+/karma-reports/
+
+# End-to-end test output
+/e2e/*.js
+/e2e/*.map
+
+# IntelliJ
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# WebStorm
+.idea/
+
+# Sublime Text
+.sublime/
+
+# Windows thumbnails
+Thumbs.db
+ehthumbs.db
+
+# macOS files
+.DS_Store
+
+# Temporary files
+*.swp
+*.swo
+*.swn
+*.tmp
+
+# Lockfiles
+package-lock.json
+yarn.lock
+
+# Angular CLI configuration
+.angular
+angular.json
+angular-cli.json
+.nx/
+
+# Prettier
+.prettierignore
+.prettier.toml
+prettier.config.js
+.prettierrc
+.prettier.config.cjs
+
+# TypeScript configuration
+tsconfig.json
+tsconfig.app.json
+tsconfig.spec.json
+tsconfig*.json
+
+# Yarn 2
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+!.pnp.*
+.pnp.*
+
+# Jest
+coverage/
