@@ -1,0 +1,10 @@
+.headerSticky {
+  position: sticky;
+  z-index: 10;
+  top: 0;
+  background: white;
+}
+
+.rightMenuHeight {
+  height: 160px;
+}

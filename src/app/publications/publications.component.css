@@ -1,0 +1,33 @@
+
+
+  /* Styles for the SVG to fill the parent div */
+  .responsive-svg > svg{
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .svg-parent {
+    
+  }
+  
+  .svg-parent img {
+
+  }
+
+  .no-home {
+    height: 60vh; display: flex; flex-flow: column; align-items: center; justify-content: center;
+
+  }
+  
+  .no-home img {
+    height: 30vh;
+    padding-bottom: 1%;
+  }
+
+  .text-bold{
+    font-size: 100%;
+    text-align: center;
+    display: flex; 
+    justify-content: center ;
+    padding: 10px;
+  }

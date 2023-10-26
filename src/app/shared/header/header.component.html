@@ -1,0 +1,52 @@
+<nav id="main_header" class="main-header navbar-white" [ngClass]="{'ml-0': stand_alone_header}">
+    <div class="row m-0 d-flex header-row justify-content-between align-items-center">
+        <div class="sidebar__brand" *ngIf="stand_alone_header">
+            <a (click)="onHomePageNavigate()" class="sidebar__brand-logo">
+                <img class="default-icon" src="/assets/svgs/main-logo.svg" alt="Brand logo Enterprise Insight">
+                <img class="dark-active" src="/assets/svgs/main-logo-whtie.svg" alt="Brand logo Enterprise Insight">
+            </a>
+        </div>
+        <div *ngIf="show_environment" class="col-auto col-md-3 top-left d-flex align-items-center">
+            <button type="button">
+                <span></span>
+            </button>
+            <div class="select" (click)="onEnvironmentExpand()" [ngClass]="{'active': isEnvironmentExpanded}">
+                <button class="btn d-flex align-items-center">
+                    <span class="icon-wrap">
+                        <img class="default-icon" src="/assets/svgs/activity.svg">
+                        <img class="dark-active" src="/assets/svgs/activity-ic-white.svg">
+                    </span>
+                    <span>Environment</span>
+                </button>
+                <div class="select__info">
+                    <a class="dropdown-item" href="#">Environment 1 </a>
+                    <a class="dropdown-item" href="#">Environment 2 </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-auto col-md-6 top-right d-flex">
+            <ul class="navbar-nav ml-auto">
+                <ng-container *ngIf="adminUser">
+                    <li class="nav-item d-sm-inline-block">
+                        <a [routerLink]="'/administration/users/' + userId +'/edit'" class="nav-link">
+                            <span>
+                                <img class="default-icon" src="/assets/svgs/user-ic.svg" alt="User icon ">
+                                <img class="dark-active" src="/assets/svgs/user-ic-red.svg" alt="User icon Red">
+                            </span>
+                            <dfn class="d-none d-md-block"> My Profile</dfn>
+                        </a>
+                    </li>
+                </ng-container>
+                <li class="nav-item d-sm-inline-block">
+                    <a routerLink="/auth/logout" class="nav-link">
+                        <span>
+                            <img class="default-icon" src="/assets/svgs/log-out-ic.svg" alt="Logout icon ">
+                            <img class="dark-active" src="/assets/svgs/log-out-ic-red.svg" alt="Logout icon Red">
+                        </span>
+                        <dfn class="d-none d-md-block">Logout</dfn>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

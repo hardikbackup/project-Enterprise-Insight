@@ -1,0 +1,105 @@
+<app-master-layout></app-master-layout>
+<div class="content-wrapper types-editor">
+    <div class="content-wrapper__data-title">
+        <div class="row data-highlight d-flex align-items-center m-0">
+            <div class="title-holder col-lg-auto col-12 col-sm-6 d-flex align-items-center p-0">
+                <a class="btn back-btn" routerLink="/queries">
+                    <img class="default-icon" src="/assets/svgs/arrow-left-ic.svg" alt="Left arrow">
+                    <img class="hover-icon" src="/assets/svgs/arrow-left-ic-red.svg" alt="Left arrow red">
+                </a>
+                <h3>Query Editor</h3>
+            </div>
+            <div class="btn-wrapper action-triger-wrap transparent-btn btn__inline d-flex align-items-center col-lg-auto col-12 col-sm-6 col-md-12 mt-3 mt-sm-0 mt-md-4 mt-lg-0 p-0 ml-sm-auto">
+                <ng-container *ngIf="!isLoading">
+                    <button type="button" class="btn ml-sm-auto ml-md-0 ml-lg-auto transparent-btn" routerLink="/queries" *ngIf="!isLoading">
+                        <img src="/assets/svgs/discard-trash-ic.svg" alt="Trash icon" class="icon">
+                        Discard
+                    </button>
+                    <button type="button" class="btn transparent-btn fill" (click)="onRunQuery()">
+                        <img src="/assets/img/double-arrow-right.png" alt="Save icon" class="icon mr-1 w12">
+                        Run Query
+                    </button>
+                    <button type="button" class="btn transparent-btn fill" *ngIf="!isLoading" (click)="onQuerySave()">
+                        <img src="/assets/svgs/save-ic-white.svg" alt="Save icon" class="icon">
+                        Save
+                    </button>
+                </ng-container>
+                <div *ngIf="isLoading">
+                    <img src="/assets/img/loader.gif" class="w24">
+                </div>
+            </div>
+        </div>
+        <div class="row m-0 data-trigger d-flex align-items-center" *ngIf="queryId">
+            <div class="col-md-8 col-sm-12 px-0 breadcrumb-info d-none d-md-block">
+                <div class="breadcrumbs">
+                    <a routerLink="/queries">Queries</a>
+                    <a class="active">
+                        {{ queryDetails.name }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="type-editor-content new-attribute-types">
+        <div class="row">
+            <div class="col-12 options-col">
+                <div class="options-wrap transparent-bg">
+                    <form [formGroup]="form" autocomplete="disabled">
+                        <div class="header">
+                            <div class="row field-row">
+                                <div class="col-md-12 type-name mb-3">
+                                    <div class="form-group">
+                                        <label for="name">Name</label>
+                                        <input type="text" class="form-control" id="name" formControlName="name">
+                                        <span class="position-absolute red mb-2" *ngIf="hasFormSubmitted && !form.controls.name.valid">Required</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 type-name mb-3">
+                                    <div class="form-group">
+                                        <label for="query">Query</label>
+                                        <textarea class="form-control h200" id="query" formControlName="query"></textarea>
+                                        <span class="position-absolute red mb-2" *ngIf="hasFormSubmitted && !form.controls.query.valid">Required</span>
+                                    </div>
+                                </div>
+                                <ng-container *ngIf="hasReportRun">
+                                    <span>Results</span>
+                                    <div *ngIf="isQueryLoading">
+                                        <img src="/assets/img/loader.gif" class="w24">
+                                    </div>
+                                    <table class="table table-borderless input-color" *ngIf="queryResults.length">
+                                        <thead>
+                                            <tr>
+                                                <th [ngClass]="{ 'pl-0': idx == 0 }" *ngFor="let item of queryResults[0]; let idx = index">
+                                                    {{ item }}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <ng-container *ngFor="let item of queryResults; let idx = index;">
+                                                <tr *ngIf="idx != 0">
+                                                    <td [ngClass]="{ 'pl-0': rowIndex == 0 }" *ngFor="let row of item; let rowIndex = index">
+                                                        {{ row }}
+                                                    </td>
+                                                </tr>
+                                            </ng-container>
+                                        </tbody>
+                                    </table>
+                                    <div class="alert alert-info" *ngIf="!queryResults.length">
+                                        No results found
+                                    </div>
+                                    <div class="load-more-wrap" *ngIf="currentPage && currentPage < pages">
+                                        <section *ngIf="isQueryLoading" class="mt-1">
+                                            <img src="/assets/img/loader.gif" class="w24 vertical-align-middle mr-1">
+                                            <b>Loading</b>
+                                        </section>
+                                        <button class="btn" (click)="loadQueryResults(currentPage + 1)" *ngIf="!isQueryLoading">Load more</button>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,67 @@
+<main class="main-wap" id="main-wrapper" *ngIf="firstLoad">
+    <div class="d-flex align-items-center justify-content-center guest-wrap p-4">
+        <div class="card guest-card mw-100 border-0">
+            <div class="card-header border-0 bg-white d-flex justify-content-center">
+                <div class="brand-logo">
+                    <img class="default-icon" src="/assets/svgs/main-logo.svg" alt="Brand logo Enterprise Insight">
+                    <img class="dark-active" src="/assets/svgs/main-logo-whtie.svg" alt="Brand logo Enterprise Insight">
+                </div>
+            </div>
+            <form [formGroup]="form" (ngSubmit)="onSubmitLogin()" class="card-body">
+                <h3 class="text-black">Sign in to Your Account</h3>
+                <div class="form-group">
+                    <label for="guest-email">Email</label>
+                    <input type="email" formControlName="email" id="guest-email" class="form-control" placeholder="Enter your email" required #email>
+                </div>
+                <div class="form-group">
+                    <label for="guest-password">Password</label>
+                    <div class="form-field position-relative">
+                        <input [type]="passwordFieldType" id="guest-password" formControlName="password" class="form-control" placeholder="Enter your password" required #password>
+                        <button type="button" class="toggle-password" (click)="onTogglePasswordFieldType()">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                <path fill="currentColor" d="M17.725 7.65c-.242-.383-.5-.742-.767-1.075a.834.834 0 0 0-1.242-.075l-2.5 2.5a3.26 3.26 0 0 1 .05 1.842 3.35 3.35 0 0 1-2.416 2.416 3.27 3.27 0 0 1-1.842-.05l-2.05 2.05c-.417.417-.283 1.15.275 1.367a7.683 7.683 0 0 0 2.767.517c1.483 0 2.925-.434 4.241-1.242 1.342-.833 2.55-2.058 3.525-3.617.792-1.258.75-3.375-.041-4.633Zm-6.042.667-3.367 3.367a2.418 2.418 0 0 1-.7-1.683A2.388 2.388 0 0 1 10 7.617c.65 0 1.25.275 1.683.7Z" />
+                                <path fill="currentColor" d="m15.209 4.79-2.825 2.826A3.322 3.322 0 0 0 10 6.632 3.363 3.363 0 0 0 6.634 10c0 .933.375 1.775.983 2.383L4.8 15.207h-.008c-.925-.75-1.775-1.708-2.5-2.841-.833-1.309-.833-3.434 0-4.742.967-1.517 2.15-2.708 3.467-3.525C7.075 3.3 8.517 2.857 10 2.857c1.859 0 3.659.684 5.209 1.934ZM12.383 10A2.388 2.388 0 0 1 10 12.381c-.05 0-.092 0-.142-.016l2.509-2.509c.016.05.016.092.016.142Z" />
+                                <path fill="currentColor" d="M18.142 1.857a.644.644 0 0 0-.909 0L1.858 17.241a.644.644 0 0 0 0 .908.632.632 0 0 0 .9-.008L18.142 2.757a.62.62 0 0 0 0-.9Z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="d-flex w-100 justify-content-end form-group">
+                    <a routerLink="/auth/forgot-password">Forgot Password?</a>
+                </div>
+                <div class="w-100 submit-btn-row">
+                    <ng-container *ngIf="isLoading">
+                        <div class="text-center">
+                            <img src="/assets/img/loader.gif" class="w24">
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="!isLoading">
+                        <button type="submit" class="btn fill submit w-100">Sign In</button>
+                    </ng-container>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+<ng-template #portalUser let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title text-center">
+            Confirmation Required
+        </h4>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+            You do not have permissions to login to Enterprise Insight as an editor, login to publications?
+        </div>
+    </div>
+    <div class="modal-footer justify-content-center">
+        <div class="row row-cols-1 row-cols-sm-2 no-gutters m-0">
+            <div class="col pr-sm-2">
+                <button type="button" class="btn transparent-btn w-100" data-dismiss="modal" (click)="logout()">No</button>
+            </div>
+            <div class="col pl-sm-2">
+                <button type="button" class="btn btn-red w-100" (click)="goToPortal()">Yes</button>
+            </div>
+        </div>
+    </div>
+</ng-template>

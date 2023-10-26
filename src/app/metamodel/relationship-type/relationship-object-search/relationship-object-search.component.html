@@ -1,0 +1,84 @@
+<div class="row no-gutters dual-list-box">
+    <div class="col-sm-6 col-12">
+        <div class="form-wrap mb-4">
+            <div class="check-wrap radio-item label-text">
+                <input type="radio" id="from_any" [checked]="selectedFromObjectType.id == 'any'" (click)="onFromAnyChange($event)">
+                <label for="from_any">
+                    <p class="lead-text">ANY</p>
+                </label>
+                <div class="checkbox"></div>
+            </div>
+        </div>
+        <p class="lead-text">From Object Type</p>
+        <div class="form-group" style="display:none;">
+            <input type="text" class="form-control" (keyup)="onSearchFromObjectType(1)" placeholder="Search" #fromObjectKeywordEl>
+        </div>
+        <div class="form-wrap" *ngIf="fromObjectTypesLoading">
+            <img src="/assets/img/loader.gif" class="w24">
+            Loading
+        </div>
+        <section *ngIf="!fromObjectTypesLoading">
+            <section class="scrollable-area">
+                <div class="form-wrap" *ngFor="let item of fromObjectTypes">
+                    <div class="check-wrap radio-item label-text">
+                        <input type="radio" name="from_obj_checkbox" [id]="'from_label_' + item.object_type_id" [checked]="selectedFromObjectType.id == item.object_type_id" (change)="onFromObjectChecked($event, item)">
+                        <label [for]="'from_label_' + item.object_type_id">{{ item.name }}</label>
+                        <div class="checkbox"></div>
+                    </div>
+                </div>
+            </section>
+            <div class="pagination d-flex align-items-center mt-4" *ngIf="fromObjectTypeShowPagination && fromObjectTypeTotalPages > 1">
+                <button class="prev btn" [ngClass]="{'disabled' : fromObjectTypeCurrentPage <= 1}" (click)="onSearchFromObjectType(fromObjectTypeCurrentPage - 1)">
+                    <img src="/assets/svgs/pagination-arrow-left-ic.svg">
+                </button>
+                <span [ngClass]="{'active': fromObjectTypeCurrentPage == index + 1}" *ngFor="let key of this.fromObjectTypeMaxShowPage; let index = index" (click)="onSearchFromObjectType(index + 1)">
+                    {{ index + 1 }}
+                </span>
+                <button class="next btn" [ngClass]="{'disabled': fromObjectTypeCurrentPage >= fromObjectTypeTotalPages}" (click)="onSearchFromObjectType(fromObjectTypeCurrentPage + 1)">
+                    <img src="/assets/svgs/pagination-arrow-right-ic.svg">
+                </button>
+            </div>
+        </section>
+    </div>
+    <div class="col-sm-6 col-12 assigned-values">
+        <div class="form-wrap mb-4">
+            <div class="check-wrap radio-item label-text">
+                <input type="radio" id="to_any" [checked]="selectedToObjectType.id == 'any'" (click)="onToAnyChange($event)">
+                <label for="to_any">
+                    <p class="lead-text">ANY</p>
+                </label>
+                <div class="checkbox"></div>
+            </div>
+        </div>
+        <p class="lead-text">To Object Type</p>
+        <div class="form-group" style="display:none;">
+            <input type="text" class="form-control" (keyup)="onSearchToObjectType(1)" placeholder="Search" #toObjectKeywordEl>
+        </div>
+        <div class="form-wrap" *ngIf="toObjectTypesLoading">
+            <img src="/assets/img/loader.gif" class="w24">
+            Loading
+        </div>
+        <section *ngIf="!toObjectTypesLoading">
+            <section class="scrollable-area">
+                <div class="form-wrap" *ngFor="let item of toObjectTypes">
+                    <div class="check-wrap radio-item label-text">
+                        <input type="radio" name="to_obj_checkbox" [id]="'to_label_' + item.object_type_id" [checked]="selectedToObjectType.id == item.object_type_id" (change)="onToObjectChecked($event, item)">
+                        <label [for]="'to_label_' + item.object_type_id">{{ item.name }}</label>
+                        <div class="checkbox"></div>
+                    </div>
+                </div>
+            </section>
+            <div class="pagination d-flex align-items-center mt-4" *ngIf="toObjectTypeShowPagination && toObjectTypeTotalPages > 1">
+                <button class="prev btn" [ngClass]="{'disabled': toObjectTypeCurrentPage <= 1}" (click)="onSearchToObjectType(toObjectTypeCurrentPage - 1)">
+                    <img src="/assets/svgs/pagination-arrow-left-ic.svg">
+                </button>
+                <span [ngClass]="{'active': toObjectTypeCurrentPage == index + 1}" *ngFor="let key of this.toObjectTypeMaxShowPage; let index = index" (click)="onSearchToObjectType(index + 1)">
+                    {{ index + 1 }}
+                </span>
+                <button class="next btn" [ngClass]="{'disabled': toObjectTypeCurrentPage >= toObjectTypeTotalPages}" (click)="onSearchToObjectType(toObjectTypeCurrentPage + 1)">
+                    <img src="/assets/svgs/pagination-arrow-right-ic.svg">
+                </button>
+            </div>
+        </section>
+    </div>
+</div>

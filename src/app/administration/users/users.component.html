@@ -1,0 +1,515 @@
+<app-master-layout></app-master-layout>
+<div class="content-wrapper object-types-contents">
+  <div class="content-wrapper__data-title">
+    <div class="row data-highlight d-flex align-items-center m-0">
+      <div
+        class="title-holder col-lg-auto col-12 d-flex align-items-center p-0"
+      >
+        <span>
+          <img class="default-icon" src="/assets/svgs/user-ic.svg" />
+          <img class="hover-icon" src="/assets/svgs/user-ic-red.svg" />
+        </span>
+        <h3>User</h3>
+      </div>
+      <div
+        class="btn-wrapper action-triger-wrap btn__inline col-lg-auto col-6 col-md-12 mt-3 mt-md-4 mt-lg-0 d-flex justify-content-xl-end p-0 ml-auto"
+      >
+        <a
+          *ngIf="getTotalSelectedUsers()"
+          (click)="onDeleteMultipleUsers()"
+          class="btn transparent-btn medium ml-0"
+        >
+          <span class="icon-wrap">
+            <img
+              class="default-icon"
+              src="/assets/svgs/trash-ic.svg"
+              alt="Trash icon"
+            />
+            <img
+              class="dark-active"
+              src="/assets/svgs/trash-ic-white.svg"
+              alt="Trash icon Red"
+            />
+          </span>
+          <dfn class="d-none d-md-block">
+            Delete Selected ({{ getTotalSelectedUsers() }})
+          </dfn>
+        </a>
+        <a
+          href="#"
+          class="btn transparent-btn medium border-red"
+          (click)="onInviteUser()"
+        >
+          <span class="icon-wrap">
+            <img
+              class="default-icon"
+              src="/assets/svgs/plus-ic.svg"
+              alt="Plus icon "
+            />
+            <img
+              class="dark-active"
+              src="/assets/svgs/plus-ic-white.svg"
+              alt="Plus icon Red"
+            />
+          </span>
+          <span class="d-md-none icon-wrap">
+            <img
+              class="default-icon"
+              src="/assets/svgs/user-ic.svg"
+              alt="User icon "
+            />
+            <img
+              class="dark-active"
+              src="/assets/svgs/user-ic-red.svg"
+              alt="User icon "
+            />
+          </span>
+          <dfn class="d-none d-md-block">Invite User</dfn>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="content-details list-view">
+    <div class="row position-relative z-index-11">
+      <div class="col-12">
+        <div class="item-nav">
+          <a
+            href="#"
+            [ngClass]="{ active: usersType == 'active' }"
+            (click)="onTabChange('active')"
+            >Active Users</a
+          >
+          <a
+            href="#"
+            [ngClass]="{ active: usersType == 'invited' }"
+            (click)="onTabChange('invited')"
+            >Invited Users</a
+          >
+        </div>
+      </div>
+    </div>
+    <div class="row m-0">
+      <div class="col-12 px-0 data-nav">
+        <table class="table">
+          <thead class="list-item list-heading">
+            <tr class="data-highlight-info">
+              <th class="data-call cursor-pointer" style="padding-left: 0px">
+                <div class="d-flex align-items-center">
+                  <div class="check-wrap">
+                    <input
+                      type="checkbox"
+                      id="select-all"
+                      (change)="selectAllRecords($event)"
+                      [checked]="isAllReSelected"
+                    />
+                    <label for="select-all"></label>
+                  </div>
+                  <div
+                    (click)="sortBy('first_name')"
+                    class="cursor-pointer"
+                    style="padding-left: 24px"
+                  >
+                    First Name
+                    <button class="btn btn-sort">
+                      <img
+                        src="/assets/svgs/chevron-up-ic.svg"
+                        *ngIf="defaultSort == 'first_name_asc'"
+                      />
+                      <img
+                        src="/assets/svgs/chevron-down-ic.svg"
+                        *ngIf="defaultSort == 'first_name_desc'"
+                      />
+                    </button>
+                  </div>
+                </div>
+              </th>
+              <th
+                class="created-on cursor-pointer"
+                (click)="sortBy('last_name')"
+              >
+                Last Name
+                <button class="btn btn-sort">
+                  <img
+                    src="/assets/svgs/chevron-down-ic.svg"
+                    *ngIf="defaultSort == 'last_name_desc'"
+                  />
+                  <img
+                    src="/assets/svgs/chevron-up-ic.svg"
+                    *ngIf="defaultSort == 'last_name_asc'"
+                  />
+                </button>
+              </th>
+              <th class="created-on cursor-pointer" (click)="sortBy('created')">
+                Created On
+                <button class="btn btn-sort">
+                  <img
+                    src="/assets/svgs/chevron-down-ic.svg"
+                    *ngIf="defaultSort == 'created_date_desc'"
+                  />
+                  <img
+                    src="/assets/svgs/chevron-up-ic.svg"
+                    *ngIf="defaultSort == 'created_date_asc'"
+                  />
+                </button>
+              </th>
+              <th
+                class="last-updated cursor-pointer"
+                (click)="sortBy('updated')"
+              >
+                Updated On
+                <button class="btn btn-sort">
+                  <img
+                    src="/assets/svgs/chevron-down-ic.svg"
+                    *ngIf="defaultSort == 'updated_date_desc'"
+                  />
+                  <img
+                    src="/assets/svgs/chevron-up-ic.svg"
+                    *ngIf="defaultSort == 'updated_date_asc'"
+                  />
+                </button>
+              </th>
+              <th
+                class="last-updated cursor-pointer"
+                (click)="sortBy('created_by')"
+              >
+                Created By
+                <button class="btn btn-sort">
+                  <img
+                    src="/assets/svgs/chevron-down-ic.svg"
+                    *ngIf="defaultSort == 'created_by_desc'"
+                  />
+                  <img
+                    src="/assets/svgs/chevron-up-ic.svg"
+                    *ngIf="defaultSort == 'created_by_asc'"
+                  />
+                </button>
+              </th>
+              <th
+                class="last-updated cursor-pointer"
+                (click)="sortBy('updated_by')"
+              >
+                Last Updated By
+                <button class="btn btn-sort">
+                  <img
+                    src="/assets/svgs/chevron-down-ic.svg"
+                    *ngIf="defaultSort == 'updated_by_desc'"
+                  />
+                  <img
+                    src="/assets/svgs/chevron-up-ic.svg"
+                    *ngIf="defaultSort == 'updated_by_asc'"
+                  />
+                </button>
+              </th>
+              <th
+                class="created-by cursor-pointer"
+                (click)="sortBy('last_login')"
+              >
+                Last Login Date
+                <button class="btn btn-sort">
+                  <img
+                    src="/assets/svgs/chevron-down-ic.svg"
+                    *ngIf="defaultSort == 'last_login_desc'"
+                  />
+                  <img
+                    src="/assets/svgs/chevron-up-ic.svg"
+                    *ngIf="defaultSort == 'last_login_asc'"
+                  />
+                </button>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              class="list-item"
+              *ngFor="let item of users"
+              (contextmenu)="onUserOptions($event, item, true)"
+            >
+              <td class="data-call">
+                <div class="d-flex align-items-center">
+                  <div class="check-wrap">
+                    <input
+                      type="checkbox"
+                      [id]="'user_item_' + item.id"
+                      (change)="checkUserItem($event, item)"
+                      [checked]="userCheckedItems[item.id]"
+                    />
+                    <label [for]="'user_item_' + item.id"></label>
+                  </div>
+                  <div class="title-holder d-flex align-items-center">
+                    <span
+                      [routerLink]="
+                        '/administration/users/' + item.id + '/edit'
+                      "
+                    >
+                      <img src="/assets/svgs/user-ic.svg" class="static-icon" />
+                      <img
+                        src="/assets/svgs/user-ic-red.svg"
+                        class="dark-active"
+                      />
+                    </span>
+                    <ng-container *ngIf="renameUserData.id !== item.id">
+                      <dfn
+                        class="cursor-pointer"
+                        [routerLink]="
+                          '/administration/users/' + item.id + '/edit'
+                        "
+                        class="cursor-pointer"
+                        >{{ item.first_name }}</dfn
+                      >
+                    </ng-container>
+                    <div
+                      class="form-group w-100"
+                      *ngIf="renameUserData.id == item.id"
+                    >
+                      <input
+                        type="text"
+                        class="form-control"
+                        [id]="'rename_first_' + item.id"
+                        [value]="item.first_name"
+                        (keyup)="onRenameKeyup($event, item)"
+                      />
+                      <!--                                            <input type="text" class="form-control" [id]="'rename_last_' + item.id" [value]="item.last_name" (keyup)="onRenameKeyup($event, item)">-->
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="created-on">
+                <div class="d-flex align-items-center">
+                  <div class="title-holder d-flex align-items-center">
+                    <ng-container *ngIf="renameUserData.id !== item.id">
+                      <dfn
+                        class="cursor-pointer"
+                        [routerLink]="
+                          '/administration/users/' + item.id + '/edit'
+                        "
+                        class="cursor-pointer"
+                        >{{ item.last_name }}</dfn
+                      >
+                    </ng-container>
+                    <div
+                      class="form-group w-100"
+                      *ngIf="renameUserData.id == item.id"
+                    >
+                      <input
+                        type="text"
+                        class="form-control"
+                        [id]="'rename_last_' + item.id"
+                        [value]="item.last_name"
+                        (keyup)="onRenameKeyup($event, item)"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="created-on">{{ item.created_date }}</td>
+              <td class="last-updated">{{ item.updated_date }}</td>
+              <td class="last-updated">{{ item.created_by }}</td>
+              <td class="last-updated">{{ item.updated_by }}</td>
+              <td
+                class="last-updated"
+                [routerLink]="'/administration/users/' + item.id + '/edit'"
+              >
+                {{ item.last_login_date }}
+              </td>
+              <td>
+                <div class="float-right position-relative">
+                  <div
+                    class="action-hold d-flex align-items-center"
+                    [ngClass]="{
+                      'options-shown':
+                        userExpandOptions.id == item.id &&
+                        userExpandOptions.type == 'fixed'
+                    }"
+                  >
+                    <button
+                      class="more-btn action-btn"
+                      [ngClass]="{ active: userExpandOptions.id == item.id }"
+                      (click)="onUserOptions($event, item, false)"
+                    >
+                      <img
+                        src="/assets/svgs/more-vertical-ic-2.svg"
+                        alt="More icon"
+                      />
+                    </button>
+                    <div class="dropdown-wrap">
+                      <div class="dropdown-info rightBoxHeight">
+                        <button (click)="renameUser(item)">Rename</button>
+                        <button (click)="deleteUser(item)">Delete</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <div
+                class="float-right position-relative"
+                style="{{
+                  userExpandOptions.id == item.id &&
+                  userExpandOptions.type == 'float'
+                    ? 'right:' + userExpandOptions.right + 'px;'
+                    : ''
+                }}"
+              >
+                <div
+                  class="action-hold d-flex align-items-center"
+                  [ngClass]="{
+                    'options-shown float-menu-no-box':
+                      userExpandOptions.id == item.id &&
+                      userExpandOptions.type == 'float'
+                  }"
+                >
+                  <div class="dropdown-wrap">
+                    <div class="dropdown-info rightBoxHeight">
+                      <button (click)="renameUser(item)">Rename</button>
+                      <button (click)="deleteUser(item)">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </tr>
+          </tbody>
+        </table>
+        <div class="load-more-wrap" *ngIf="currentPage && currentPage < pages">
+          <section *ngIf="isLoadingUsers" class="mt-1">
+            <img
+              src="/assets/img/loader.gif"
+              class="w24 vertical-align-middle mr-1"
+            />
+            <b>Loading</b>
+          </section>
+          <button
+            class="btn"
+            (click)="loadUsers(currentPage + 1)"
+            *ngIf="!isLoadingUsers"
+          >
+            Load more
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #confirmDeleteUserItemModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">Confirmation Required</h4>
+    <button
+      type="button"
+      class="close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('dismiss')"
+    >
+      <span aria-hidden="true">
+        <img src="/assets/svgs/modal-x-ic.svg" alt="X icon" />
+      </span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      Are you sure you want to delete following item(s)?
+      <ul class="mt-2 list-unstyled">
+        <ng-container *ngIf="!deleteSingleItem">
+          <li
+            class="mb-1"
+            *ngFor="let item of userCheckedItems | keyvalue; let index = index"
+          >
+            <div class="folder-model-box-sm no-border">
+              <span class="text-bold text-dark">
+                {{ item.value.name }}
+              </span>
+            </div>
+          </li>
+        </ng-container>
+        <li class="mb-1" *ngIf="deleteSingleItem">
+          <div class="folder-model-box-sm no-border">
+            <span class="text-bold text-dark">
+              {{ deleteSingleItemData.name }}
+            </span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="modal-footer justify-content-center">
+    <div class="row row-cols-1 row-cols-sm-2 no-gutters m-0">
+      <div class="col pr-sm-2">
+        <button
+          type="button"
+          class="btn transparent-btn w-100"
+          data-dismiss="modal"
+          (click)="modal.dismiss('dismiss')"
+        >
+          No
+        </button>
+      </div>
+      <div class="col pl-sm-2">
+        <button
+          type="button"
+          class="btn btn-red w-100"
+          (click)="processUserDeleteProcess()"
+        >
+          Yes
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #inviteUserModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">Invite User</h4>
+    <button
+      type="button"
+      class="close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('dismiss')"
+    >
+      <span aria-hidden="true">
+        <img src="/assets/svgs/modal-x-ic.svg" alt="X icon" />
+      </span>
+    </button>
+  </div>
+  <form
+    *ngIf="inviteUserForm"
+    [formGroup]="inviteUserForm"
+    (ngSubmit)="onSendInvitation()"
+  >
+    <div class="modal-body">
+      <div class="form-group">
+        <input
+          type="email"
+          class="form-control"
+          formControlName="email"
+          id="email"
+          placeholder="Email"
+        />
+        <span
+          class="red mb-2"
+          [ngClass]="[
+            hasFolderCreateFormSubmitted && !inviteUserForm.controls.email.valid
+              ? 'visible'
+              : 'invisible'
+          ]"
+          >Please specify valid email</span
+        >
+      </div>
+    </div>
+    <div class="text-center mb-4 mt-4" *ngIf="isInvitationLoading">
+      <img src="/assets/img/loader.gif" class="w24" />
+      Processing your request
+    </div>
+    <div
+      class="modal-footer justify-content-center"
+      *ngIf="!isInvitationLoading"
+    >
+      <button
+        type="button"
+        class="btn transparent-btn"
+        data-dismiss="modal"
+        (click)="modal.dismiss('dismiss')"
+      >
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-red">Send Invitation</button>
+    </div>
+  </form>
+</ng-template>

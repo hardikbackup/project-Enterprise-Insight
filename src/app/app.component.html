@@ -1,0 +1,29 @@
+<section>
+ <ng-template #sessionTimeOutModel let-modal>
+     <div class="modal-header">
+      <h4 class="modal-title text-center" style="background-color: #f5f5f5;">
+        Session Timeout
+        </h4>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+         (click)="close()">
+         <span aria-hidden="true">
+         <img src="/assets/svgs/modal-x-ic.svg" alt="X icon">
+         </span>
+         </button>
+         </div>
+          <form>
+        <div class="modal-body">
+         <div class="form-group">
+            Do you wish to extend the session?
+           </div>
+           </div>
+           
+          <div class="modal-footer">
+           <button type="button" class="btn transparent-btn" data-dismiss="modal"
+           (click)="close()">No</button>
+            <button  class="btn btn-red" (click)="getRefreshToken()">Yes</button>
+           </div>
+         </form>
+     </ng-template>
+    </section>
+   <router-outlet></router-outlet>

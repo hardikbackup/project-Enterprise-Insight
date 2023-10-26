@@ -1,0 +1,1237 @@
+<ul
+  class="list-dropdown display-block model-object-tree"
+  [id]="parentId"
+  cdkDropList
+  [cdkDropListSortingDisabled]="true"
+>
+  <li
+    class="list-item drag_item drag_parent drag_item_{{ item.type }}"
+    [attr.data-parent-id]="parentId"
+    [attr.data-parent-type]="parentType"
+    [attr.data-type]="item.type"
+    *ngFor="let item of items; let i = index"
+    [ngClass]="{
+      expanded: item.expand,
+      dropdown: ['view', 'diagram'].indexOf(item.type) == -1
+    }"
+    [id]="item.id"
+    cdkDrag
+    [cdkDragData]="item.id"
+    (cdkDragMoved)="dragItemMoved($event, item, parentId)"
+    (cdkDragEnded)="dragItemEnded($event)"
+    [cdkDragPreviewTemplate]="previewTemplate"
+  >
+    <ng-container *ngIf="selectedMultipleItems.length > 0">
+      <span class="drop-item-prev" *cdkDragPreview>{{
+        selectedMultipleItems.length + " items"
+      }}</span>
+    </ng-container>
+    <a
+      class="list-link d-flex align-items-center cursor-pointer tree-link-item"
+      *ngIf="item.type == 'model'"
+      (click)="onModelViewItemSelect($event, item)"
+      (contextmenu)="onObjectViewOptions($event, item, true)"
+      [ngClass]="{ 'active-model-item': selectedModelId == item.id }"
+    >
+      <div class="icon">
+        <img
+          src="/assets/svgs/model-box-ic.svg"
+          alt="Model box icon"
+          class="gray-icon"
+        />
+        <img
+          src="/assets/svgs/model-box-ic-red.svg"
+          alt="Model box icon"
+          class="red-icon"
+        />
+      </div>
+      <button
+        class="arrow-btn action-btn ml-0 mr-1"
+        (click)="onOpenModelObjectItem($event, item); $event.stopPropagation()"
+      >
+        <img
+          src="/assets/svgs/inner-nav-chevron-down-ic.svg"
+          alt="Arrow right icon gray"
+          class="gray-icon"
+        />
+        <img
+          src="/assets/svgs/chevron-down-ic-red.svg"
+          alt="Arrow down icon red"
+          class="red-icon"
+        />
+      </button>
+      <span class="pre-space">{{ item.name }}</span>
+      <button
+        *ngIf="!isMxGraphMode"
+        class="delete-btn action-btn prc-10"
+        (click)="onModelClose($event, item.id); $event.stopPropagation()"
+      >
+        <img src="/assets/svgs/nav-x-ic.svg" alt="X icon" />
+      </button>
+      <div
+        class="position-relative"
+        *ngIf="!isMxGraphMode"
+        style="{{
+          modelViewExpandOptions.id == item.id &&
+          modelViewExpandOptions.type == 'float'
+            ? 'right:' + modelViewExpandOptions.right + 'px;'
+            : 'display:hidden;'
+        }}"
+      >
+        <div
+          class="action-hold d-flex align-items-center"
+          [ngClass]="
+            modelViewExpandOptions.id == item.id &&
+            modelViewExpandOptions.type == 'float'
+              ? 'options-shown float-menu-no-box'
+              : 'display-hidden'
+          "
+        >
+          <div class="dropdown-wrap top-0 model_tree_view_options">
+            <div class="dropdown-info rightMenuHeight">
+              <button
+                (click)="
+                  onModelCreateOptions($event, 'add_folder_' + item.id);
+                  $event.stopPropagation()
+                "
+                class="w-100 text-left"
+              >
+                Add Folder
+              </button>
+              <button
+                (click)="
+                  onModelCreateOptions($event, 'add_object_' + item.id);
+                  $event.stopPropagation()
+                "
+                class="w-100 text-left"
+              >
+                Add Object
+              </button>
+              <button
+                (click)="
+                  onModelCreateOptions($event, 'add_diagram_' + item.id);
+                  $event.stopPropagation()
+                "
+                class="w-100 text-left"
+              >
+                Add Diagram
+              </button>
+              <button
+                (click)="
+                  onModelCreateOptions($event, 'import_diagram_' + item.id);
+                  $event.stopPropagation()
+                "
+                class="w-100 text-left"
+              >
+                Import Diagram
+              </button>
+              <button
+                (click)="
+                  onModelFolderItemPaste($event, item); $event.stopPropagation()
+                "
+              >
+                Paste
+              </button>
+              <ng-container *ngIf="admin">
+                <button
+                  (click)="
+                    onOpenPermissionsModal(item); $event.stopPropagation()
+                  "
+                >
+                  Permissions
+                </button>
+              </ng-container>
+              <button (click)="onOrganizeModel(item); $event.stopPropagation()">
+                Run organization
+              </button>
+              <button (click)="onOpenChangeLog(item); $event.stopPropagation()">
+                Change Log
+              </button>
+              <button
+                (click)="onModelDelete($event, item); $event.stopPropagation()"
+                class="w-100 text-left"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+    <a
+      class="dropdown-item-link d-flex align-items-center cursor-pointer model-viewer-folder tree-link-item tree-item"
+      *ngIf="item.type == 'folder'"
+      [attr.data-index]="i"
+      [attr.data-type]="'folder'"
+      [attr.data-id]="item.id"
+      [attr.data-name]="item.name"
+      [attr.data-parent-id]="parentId"
+      (contextmenu)="onObjectViewOptions($event, item, true)"
+      (click)="onModelViewItemSelect($event, item)"
+      [ngClass]="{
+        'active-model-item tree-item-selected': isCheckedItem(item, 'folder'),
+        'options-shown': item.id == modelViewExpandOptions.id
+      }"
+    >
+      <div class="icon">
+        <img
+          src="/assets/svgs/folder-ic.svg"
+          alt="Model Folder icon"
+          class="gray-icon"
+        />
+        <img
+          src="/assets/svgs/folder-ic-red.svg"
+          alt="Folder box icon"
+          class="red-icon"
+        />
+      </div>
+      <ng-container *ngIf="renameFolder.id !== item.id">
+        <span class="pre-space">{{ item.name }}</span>
+      </ng-container>
+      <div class="form-group w-100" *ngIf="renameFolder.id == item.id">
+        <input
+          type="text"
+          class="form-control h24 rename-input"
+          [id]="'rename_' + item.id"
+          [value]="item.name"
+          (keyup)="onRenameKeyup($event, item)"
+        />
+      </div>
+      <button
+        *ngIf="!isMxGraphMode && renameFolder.id != item.id"
+        class="more-btn action-btn"
+        [ngClass]="{
+          active:
+            item.id == modelViewExpandOptions.id &&
+            modelViewExpandOptions.type == 'fixed'
+        }"
+        (click)="
+          onFolderViewOptions($event, item, false); $event.stopPropagation()
+        "
+      >
+        <img src="/assets/svgs/more-vertical-ic-2.svg" alt="More icon" />
+      </button>
+      <button
+        class="arrow-btn action-btn"
+        (click)="onOpenModelObjectItem($event, item); $event.stopPropagation()"
+      >
+        <ng-container *ngIf="item.has_childs">
+          <img
+            src="/assets/svgs/inner-nav-chevron-down-ic.svg"
+            alt="Arrow right icon gray"
+            class="gray-icon"
+          />
+          <img
+            src="/assets/svgs/chevron-down-ic-red.svg"
+            alt="Arrow down icon red"
+            class="red-icon"
+          />
+        </ng-container>
+      </button>
+      <div
+        *ngIf="!isMxGraphMode"
+        class="dropdown-wrap model_tree_view_options"
+        style="{{
+          modelViewExpandOptions.id == item.id &&
+          modelViewExpandOptions.type == 'float'
+            ? 'left:' + modelViewExpandOptions.left + 'px;'
+            : 'display:hidden;'
+        }}"
+        [ngClass]="{
+          'options-shown float-menu-no-box d-block':
+            modelViewExpandOptions.id == item.id &&
+            modelViewExpandOptions.type == 'float'
+        }"
+      >
+        <div class="dropdown-info rightMenuHeightForNine">
+          <ng-container *ngIf="selectedMultipleItems.length < 2">
+            <button
+              (click)="
+                openFolderCreateModal({ id: item.id, type: 'folder' });
+                $event.stopPropagation()
+              "
+              class="w-100 text-left"
+            >
+              Add Folder
+            </button>
+            <button
+              (click)="
+                openObjectCreateModal({ id: item.id, type: 'folder' });
+                $event.stopPropagation()
+              "
+              class="w-100 text-left"
+            >
+              Add Object
+            </button>
+            <button
+              (click)="
+                openObjectDiagramModal({ id: item.id, type: 'folder' });
+                $event.stopPropagation()
+              "
+              class="w-100 text-left"
+            >
+              Add Diagram
+            </button>
+            <button
+              (click)="
+                onSelectDiagramFilesImport(item.id, parentId);
+                $event.stopPropagation()
+              "
+              class="w-100 text-left"
+            >
+              Import Diagram
+            </button>
+            <button
+              (click)="onFolderRename($event, item); $event.stopPropagation()"
+              class="w-100 text-left rename-item-btn"
+            >
+              Rename
+            </button>
+            <button (click)="onOpenChangeLog(item); $event.stopPropagation()">
+              Change Log
+            </button>
+          </ng-container>
+          <button
+            (click)="
+              onModelFolderItemCopy($event, item); $event.stopPropagation()
+            "
+            class="w-100 text-left"
+          >
+            Copy
+          </button>
+          <button
+            (click)="
+              onModelFolderItemPaste($event, item); $event.stopPropagation()
+            "
+            class="w-100 text-left"
+          >
+            Paste
+          </button>
+          <button (click)="onFolderDelete(item)" class="w-100 text-left">
+            Delete
+          </button>
+        </div>
+      </div>
+    </a>
+    <a
+      class="dropdown-item-link d-flex align-items-center cursor-pointer tree-link-item tree-item tree-object-item"
+      [attr.data-parent-id]="parentId"
+      [attr.data-index]="i"
+      [attr.data-id]="item.id"
+      [attr.data-name]="item.name"
+      [attr.data-type]="'object'"
+      *ngIf="item.type == 'object'"
+      (contextmenu)="onObjectViewOptions($event, item, true)"
+      [ngClass]="{
+        'active active-model-item tree-item-selected': isCheckedItem(
+          item,
+          'object'
+        ),
+        'options-shown':
+          item.id == modelViewExpandOptions.id &&
+          modelViewExpandOptions.type == 'fixed'
+      }"
+      (click)="onModelViewItemSelect($event, item)"
+      (dblclick)="onObjectDoubleClick(item)"
+      [id]="'object_tree_item_' + item.id"
+    >
+      <div class="icon">
+        <img
+          src="/assets/svgs/object-types-layers-ic-small.svg"
+          alt="Model box icon"
+          class="gray-icon"
+        />
+        <img
+          src="/assets/svgs/object-types-layers-ic-small-red.svg"
+          alt="Model box icon"
+          class="red-icon"
+        />
+      </div>
+      <ng-container *ngIf="renameObject.id !== item.id">
+        <span class="obj-class" [id]="'object_tree_item_' + item.id + '_name'">
+          {{ item.name }}
+        </span>
+      </ng-container>
+      <div class="form-group w-100" *ngIf="renameObject.id == item.id">
+        <input
+          type="text"
+          class="form-control h24 rename-input"
+          [id]="'rename_' + item.id"
+          [value]="item.name"
+          (keyup)="onRenameKeyup($event, item)"
+        />
+      </div>
+      <button
+        *ngIf="!isMxGraphMode && renameObject.id != item.id"
+        class="more-btn action-btn"
+        [ngClass]="{
+          active:
+            item.id == modelViewExpandOptions.id &&
+            modelViewExpandOptions.type == 'fixed'
+        }"
+        (click)="
+          onObjectViewOptions($event, item, false); $event.stopPropagation()
+        "
+      >
+        <img src="/assets/svgs/more-vertical-ic-2.svg" alt="More icon" />
+      </button>
+      <button
+        class="arrow-btn action-btn"
+        (click)="onOpenModelObjectItem($event, item); $event.stopPropagation()"
+      >
+        <ng-container *ngIf="item.has_childs">
+          <img
+            src="/assets/svgs/inner-nav-chevron-down-ic.svg"
+            alt="Arrow right icon gray"
+            class="gray-icon"
+          />
+          <img
+            src="/assets/svgs/chevron-down-ic-red.svg"
+            alt="Arrow down icon red"
+            class="red-icon"
+          />
+        </ng-container>
+      </button>
+      <img
+        src="/assets/svgs/link-ic-black.svg"
+        class="object-chain-item"
+        (click)="onObjectChainClick($event, item); $event.stopPropagation()"
+        [ngClass]="{
+          'd-block':
+            chainObjectRelationshipOptions.from_object_id == item.id ||
+            chainObjectRelationshipOptions.to_object_id == item.id
+        }"
+      />
+      <div
+        *ngIf="!isMxGraphMode"
+        class="dropdown-wrap model_tree_view_options"
+        style="{{
+          modelViewExpandOptions.id == item.id &&
+          modelViewExpandOptions.type == 'float'
+            ? 'left:' + modelViewExpandOptions.left + 'px;'
+            : 'display:hidden;'
+        }}"
+        [ngClass]="{
+          'options-shown float-menu-no-box d-block':
+            modelViewExpandOptions.id == item.id &&
+            modelViewExpandOptions.type == 'float'
+        }"
+      >
+        <div class="dropdown-info rightMenuHeight">
+          <ng-container *ngIf="selectedMultipleItems.length < 2">
+            <button
+              (click)="onObjectRename($event, item); $event.stopPropagation()"
+              class="w-100 text-left rename-item-btn"
+              *ngIf="selectedObjectIds.length == 1"
+            >
+              Rename
+            </button>
+          </ng-container>
+          <button
+            *ngIf="onCheckOnlyObjectsSelected()"
+            (click)="
+              onObjectAddRelationship($event, item); $event.stopPropagation()
+            "
+            class="w-100 text-left"
+          >
+            Add Relationship
+          </button>
+          <ng-container *ngIf="selectedMultipleItems.length < 2">
+            <button (click)="onOpenChangeLog(item); $event.stopPropagation()">
+              Change Log
+            </button>
+          </ng-container>
+          <button
+            (click)="
+              onModelFolderItemCopy($event, item); $event.stopPropagation()
+            "
+            class="w-100 text-left"
+            *ngIf="selectedMultipleItems.length"
+          >
+            Copy
+          </button>
+          <button
+            (click)="
+              onModelFolderItemPaste($event, item); $event.stopPropagation()
+            "
+            class="w-100 text-left"
+            *ngIf="allowPasteToObject"
+          >
+            Paste
+          </button>
+          <button
+            (click)="onObjectDelete($event, item); $event.stopPropagation()"
+            class="w-100 text-left"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </a>
+    <ng-container *ngIf="item.type == 'object'">
+      <div class="svg-draw-container"></div>
+    </ng-container>
+    <a
+      class="dropdown-item-link d-flex align-items-center cursor-pointer tree-link-item tree-item"
+      *ngIf="item.type == 'diagram'"
+      [attr.data-index]="i"
+      [attr.data-type]="'diagram'"
+      [attr.data-id]="item.id"
+      [attr.data-name]="item.name"
+      [attr.data-parent-id]="parentId"
+      (contextmenu)="onObjectViewOptions($event, item, true)"
+      [ngClass]="{
+        'active active-model-item tree-item-selected': isCheckedItem(
+          item,
+          'diagram'
+        ),
+        'options-shown':
+          item.id == modelViewExpandOptions.id &&
+          modelViewExpandOptions.type == 'fixed',
+        'inactive-diagram': isMxGraphMode
+      }"
+      (click)="onModelViewItemSelect($event, item)"
+      (dblclick)="onModelViewItemSelect($event, item, false, true)"
+      [id]="'diagram_tree_item_' + item.id"
+      [attr.data-name]="item.name"
+    >
+      <div class="icon">
+        <ng-container *ngIf="openDiagramIds.indexOf(item.id) == -1">
+          <img
+            src="/assets/svgs/diagram-icon-small.svg"
+            alt="Model box icon"
+            class="gray-icon"
+          />
+          <img
+            src="/assets/svgs/diagram-icon-small-red.svg"
+            alt="Model box icon"
+            class="red-icon"
+          />
+        </ng-container>
+        <img
+          *ngIf="openDiagramIds.indexOf(item.id) != -1"
+          src="/assets/svgs/diagram-icon-small-grey.svg"
+          alt="Model box icon"
+          class="gray-icon"
+        />
+      </div>
+      <ng-container *ngIf="renameDiagram.id !== item.id">
+        <span
+          class="pre-space"
+          [id]="'diagram_tree_item_' + item.id + '_name'"
+          >{{ item.name }}</span
+        >
+      </ng-container>
+      <div class="form-group w-100" *ngIf="renameDiagram.id == item.id">
+        <input
+          type="text"
+          class="form-control h24 rename-input"
+          [id]="'rename_' + item.id"
+          [value]="item.name"
+          (keyup)="onRenameKeyup($event, item)"
+        />
+      </div>
+      <button
+        *ngIf="!isMxGraphMode && renameDiagram.id != item.id"
+        class="more-btn action-btn"
+        [ngClass]="{
+          active:
+            item.id == modelViewExpandOptions.id &&
+            modelViewExpandOptions.type == 'fixed'
+        }"
+        (click)="
+          onObjectViewOptions($event, item, false); $event.stopPropagation()
+        "
+      >
+        <img src="/assets/svgs/more-vertical-ic-2.svg" alt="More icon" />
+      </button>
+      <div
+        *ngIf="!isMxGraphMode"
+        class="dropdown-wrap model_tree_view_options"
+        style="{{
+          modelViewExpandOptions.id == item.id &&
+          modelViewExpandOptions.type == 'float'
+            ? 'left:' + modelViewExpandOptions.left + 'px;'
+            : 'display:hidden;'
+        }}"
+        [ngClass]="{
+          'options-shown float-menu-no-box d-block':
+            modelViewExpandOptions.id == item.id &&
+            modelViewExpandOptions.type == 'float'
+        }"
+      >
+        <div class="dropdown-info rightMenuHeightForFive">
+          <ng-container *ngIf="selectedMultipleItems.length < 2">
+            <button
+              (click)="
+                onSelectEditDiagram($event, item); $event.stopPropagation()
+              "
+              class="w-100 text-left"
+            >
+              Edit
+            </button>
+            <button
+              (click)="
+                onDiagramRenameModal($event, item); $event.stopPropagation()
+              "
+              class="w-100 text-left rename-item-btn"
+            >
+              Rename
+            </button>
+            <button
+              (click)="
+                onDiagramDownload($event, item); $event.stopPropagation()
+              "
+              class="w-100 text-left"
+            >
+              Download
+            </button>
+          </ng-container>
+          <button
+            (click)="
+              onModelFolderItemCopy($event, item); $event.stopPropagation()
+            "
+            class="w-100 text-left"
+          >
+            Copy
+          </button>
+          <button
+            (click)="onDiagramDelete($event, item); $event.stopPropagation()"
+            class="w-100 text-left"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </a>
+    <a
+      class="dropdown-item-link d-flex align-items-center cursor-pointer tree-link-item tree-item"
+      *ngIf="item.type == 'view'"
+      [attr.data-index]="i"
+      [attr.data-type]="'view'"
+      [attr.data-id]="item.id"
+      [attr.data-name]="item.name"
+      [attr.data-parent-id]="parentId"
+      (contextmenu)="onObjectViewOptions($event, item, true)"
+      [ngClass]="{
+        'active active-model-item tree-item-selected': isCheckedItem(
+          item,
+          'view'
+        ),
+        'options-shown': item.id == modelViewExpandOptions.id
+      }"
+      (click)="onModelViewItemSelect($event, item)"
+      (dblclick)="onModelViewItemSelect($event, item, false, true)"
+      [id]="'view_tree_item_' + item.id"
+      [attr.data-name]="item.name"
+    >
+      <div class="icon">
+        <img
+          src="/assets/svgs/metamodel-ic-dark.svg"
+          alt="Model box icon"
+          class="gray-icon"
+        />
+        <img
+          src="/assets/svgs/metamodel-ic-red.svg"
+          alt="Model box icon"
+          class="red-icon"
+        />
+      </div>
+      <ng-container *ngIf="renameViewGenerator.id !== item.id">
+        <span
+          class="pre-space"
+          [id]="'diagram_tree_item_' + item.id + '_name'"
+          >{{ item.name }}</span
+        >
+      </ng-container>
+      <div class="form-group w-100" *ngIf="renameViewGenerator.id == item.id">
+        <input
+          type="text"
+          class="form-control h24 rename-input"
+          [id]="'rename_' + item.id"
+          [value]="item.name"
+          (keyup)="onRenameKeyup($event, item)"
+        />
+      </div>
+      <button
+        *ngIf="!isMxGraphMode && renameViewGenerator.id != item.id"
+        class="more-btn action-btn"
+        [ngClass]="{
+          active:
+            item.id == modelViewExpandOptions.id &&
+            modelViewExpandOptions.type == 'fixed'
+        }"
+        (click)="
+          onObjectViewOptions($event, item, false); $event.stopPropagation()
+        "
+      >
+        <img src="/assets/svgs/more-vertical-ic-2.svg" alt="More icon" />
+      </button>
+      <div
+        *ngIf="!isMxGraphMode"
+        class="dropdown-wrap model_tree_view_options"
+        style="{{
+          modelViewExpandOptions.id == item.id &&
+          modelViewExpandOptions.type == 'float'
+            ? 'left:' + modelViewExpandOptions.left + 'px;'
+            : 'display:hidden;'
+        }}"
+        [ngClass]="{
+          'options-shown float-menu-no-box d-block':
+            modelViewExpandOptions.id == item.id &&
+            modelViewExpandOptions.type == 'float'
+        }"
+      >
+        <div class="dropdown-info rightBoxModalHeight">
+          <ng-container *ngIf="selectedMultipleItems.length < 2">
+            <button
+              (click)="onViewRename($event, item); $event.stopPropagation()"
+              class="w-100 text-left rename-item-btn"
+            >
+              Rename
+            </button>
+          </ng-container>
+          <button
+            (click)="
+              onModelFolderItemCopy($event, item); $event.stopPropagation()
+            "
+            class="w-100 text-left"
+          >
+            Copy
+          </button>
+          <button
+            (click)="onViewDelete($event, item); $event.stopPropagation()"
+            class="w-100 text-left"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </a>
+    <app-model-object-tree
+      *ngIf="item.expand"
+      [level]="level + 1"
+      [items]="item.items"
+      [parentId]="item.id"
+      [selectedFolderId]="selectedFolderId"
+      [selectedModelId]="selectedModelId"
+      [selectedDiagramId]="selectedDiagramId"
+      [parentPages]="item.pages"
+      [parentType]="item.type"
+      [parentModelId]="
+        parentModelId ? parentModelId : item.type == 'model' ? item.id : ''
+      "
+      [selectedObjectIds]="selectedObjectIds"
+      [selectedMultipleObjects]="selectedMultipleObjects"
+      [keyword]="keyword"
+      [modelViewSocket]="modelViewSocket"
+      [loggedInUser]="loggedInUser"
+      [modelBrowserSocket]="modelBrowserSocket"
+      [modelViewFolderCopyOptions]="modelViewFolderCopyOptions"
+      [defaultObjectCreateData]="defaultObjectCreateData"
+      [isMxGraphMode]="isMxGraphMode"
+      [currentPageDetails]="currentPageDetails"
+      [mainSettings]="mainSettings"
+      [chainObjectRelationshipOptions]="chainObjectRelationshipOptions"
+      (expandChildItemRemoved)="onExpandChildItemRemoved($event)"
+      [selectedMultipleItems]="selectedMultipleItems"
+      [openDiagramIds]="openDiagramIds"
+    >
+    </app-model-object-tree>
+  </li>
+  <li>
+    <div *ngIf="pages != 1 && pages > currentPage" class="text-center">
+      <a
+        class="load-more-btn"
+        (click)="loadModelViewItems(currentPage + 1, true)"
+      >
+        <dfn class="d-none d-md-inline-block"
+          >- - - - - - - Load More - - - - - - -</dfn
+        >
+      </a>
+    </div>
+  </li>
+  <li
+    class="list-item addOptions model_folder_options"
+    *ngIf="parentType == 'model'"
+    [ngClass]="{
+      optionsExpanded: modelFolderOptionId == parentId,
+      'display-hidden': isMxGraphMode
+    }"
+  >
+    <div class="more-options">
+      <button (click)="onShowModelFolderMenuOptions(parentId)">
+        <img src="/assets/svgs/list-dropdown-plus-ic.svg" />
+      </button>
+      <div class="dropdown-options">
+        <button
+          class="d-flex align-items-center"
+          [id]="'add_folder_' + parentId"
+          (click)="openFolderCreateModal({ id: parentId, type: parentType })"
+        >
+          <span>
+            <img src="/assets/svgs/folder-ic.svg" class="static-icon" />
+            <img src="/assets/svgs/folder-ic-red.svg" class="dark-active" />
+          </span>
+          <dfn>Add Folder</dfn>
+        </button>
+        <button
+          class="d-flex align-items-center"
+          [id]="'add_object_' + parentId"
+          (click)="openObjectCreateModal({ id: parentId, type: parentType })"
+        >
+          <span>
+            <img
+              src="/assets/svgs/object-types-layers-ic-small.svg"
+              class="static-icon"
+            />
+            <img
+              src="/assets/svgs/object-types-layers-ic-small-red.svg"
+              class="dark-active"
+            />
+          </span>
+          <dfn>Add Object</dfn>
+        </button>
+        <button
+          class="d-flex align-items-center"
+          [id]="'add_diagram_' + parentId"
+          (click)="openObjectDiagramModal({ id: parentId, type: parentType })"
+        >
+          <span>
+            <img
+              src="/assets/svgs/diagram-icon-small.svg"
+              class="static-icon"
+            />
+            <img
+              src="/assets/svgs/diagram-icon-small-red.svg"
+              class="dark-active"
+            />
+          </span>
+          <dfn>Diagram</dfn>
+        </button>
+        <button
+          class="d-flex align-items-center"
+          [id]="'import_diagram_' + parentId"
+          (click)="onSelectDiagramFilesImport(parentId, parentId)"
+        >
+          <span>
+            <img src="/assets/svgs/import-diagram.svg" class="static-icon" />
+          </span>
+          <dfn> Import Diagram </dfn>
+        </button>
+      </div>
+    </div>
+  </li>
+</ul>
+
+<ng-template #createFolderModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">Create Folder</h4>
+    <button
+      type="button"
+      class="close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('dismiss')"
+    >
+      <span aria-hidden="true">
+        <img src="/assets/svgs/modal-x-ic.svg" alt="X icon" />
+      </span>
+    </button>
+  </div>
+  <form [formGroup]="folderCreateForm" (ngSubmit)="onModelFolderCreate()">
+    <div class="modal-body">
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-control"
+          formControlName="name"
+          placeholder="Folder Name"
+        />
+        <span
+          class="red mb-2"
+          *ngIf="
+            hasFolderCreateFormSubmitted &&
+            !folderCreateForm.controls.name.valid
+          "
+          >Required</span
+        >
+      </div>
+    </div>
+    <div class="text-center mb-4 mt-4" *ngIf="showAddFolderLoading">
+      <img src="/assets/img/loader.gif" class="w24" />
+      Processing your request
+    </div>
+    <div
+      class="modal-footer justify-content-center"
+      *ngIf="!showAddFolderLoading"
+    >
+      <button
+        type="button"
+        class="btn transparent-btn"
+        data-dismiss="modal"
+        (click)="modal.dismiss('dismiss')"
+      >
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-red">Create</button>
+    </div>
+  </form>
+</ng-template>
+<ng-template #createObjectModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">Create Object</h4>
+    <button
+      type="button"
+      class="close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('dismiss')"
+    >
+      <span aria-hidden="true">
+        <img src="/assets/svgs/modal-x-ic.svg" alt="X icon" />
+      </span>
+    </button>
+  </div>
+  <form [formGroup]="objectCreateForm" (ngSubmit)="onObjectCreate()">
+    <div class="modal-body">
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-control"
+          formControlName="name"
+          placeholder="Object Name"
+        />
+        <span
+          class="red mb-2"
+          *ngIf="
+            hasObjectCreateFormSubmitted &&
+            !objectCreateForm.controls.name.valid
+          "
+          >Required</span
+        >
+      </div>
+      <div class="form-group select-wrapper">
+        <ng-select
+          class="ng-dropdown"
+          formControlName="object_type_id"
+          [items]="availableObjectTypes"
+          [searchable]="true"
+          [clearable]="false"
+          [placeholder]="'Select'"
+          bindLabel="name"
+          bindValue="object_type_id"
+          (search)="onObjectTypeSearch($event)"
+        ></ng-select>
+        <span
+          class="red mb-2"
+          *ngIf="
+            hasObjectCreateFormSubmitted &&
+            !objectCreateForm.controls.object_type_id.valid
+          "
+          >Required</span
+        >
+      </div>
+    </div>
+    <div class="text-center mb-4 mt-4" *ngIf="showAddObjectLoading">
+      <img src="/assets/img/loader.gif" class="w24" />
+      Processing your request
+    </div>
+    <div
+      class="modal-footer justify-content-center"
+      *ngIf="!showAddObjectLoading"
+    >
+      <button
+        type="button"
+        class="btn transparent-btn"
+        data-dismiss="modal"
+        (click)="modal.dismiss('dismiss')"
+      >
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-red">Create</button>
+    </div>
+  </form>
+</ng-template>
+<ng-template #createDiagramModal let-modal *ngIf="parentId">
+  <div
+    class="modal-header"
+    [attr.data-parent]="parentId"
+    id="create_diagram_modal"
+  >
+    <h4 class="modal-title text-center">Create Diagram</h4>
+    <button
+      type="button"
+      class="close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('dismiss')"
+    >
+      <span aria-hidden="true">
+        <img src="/assets/svgs/modal-x-ic.svg" alt="X icon" />
+      </span>
+    </button>
+  </div>
+  <form [formGroup]="diagramCreateForm" (ngSubmit)="onDiagramCreate()">
+    <div class="modal-body">
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-control"
+          formControlName="name"
+          placeholder="Diagram Name"
+        />
+        <span
+          class="red mb-2"
+          *ngIf="
+            hasDiagramCreateFormSubmitted &&
+            !diagramCreateForm.controls.name.valid
+          "
+          >Required</span
+        >
+      </div>
+      <div class="form-group select-wrapper">
+        <ng-select
+          class="ng-dropdown"
+          id="diagram_type_id"
+          formControlName="diagram_type_id"
+          [items]="availableDiagramTypes"
+          [searchable]="true"
+          [clearable]="false"
+          [placeholder]="'Select'"
+          bindLabel="name"
+          bindValue="diagram_type_id"
+          groupBy="metamodel_name"
+          (search)="onDiagramTypeSearch($event)"
+        ></ng-select>
+        <span
+          class="red mb-2"
+          *ngIf="
+            hasDiagramCreateFormSubmitted &&
+            !diagramCreateForm.controls.diagram_type_id.valid
+          "
+          >Required</span
+        >
+      </div>
+    </div>
+    <div class="text-center mb-4 mt-4" *ngIf="showAddDiagramLoading">
+      <img src="/assets/img/loader.gif" class="w24" />
+      Processing your request
+    </div>
+    <div
+      class="modal-footer justify-content-center"
+      *ngIf="!showAddDiagramLoading"
+    >
+      <button
+        type="button"
+        class="btn transparent-btn"
+        data-dismiss="modal"
+        (click)="modal.dismiss('dismiss')"
+      >
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-red">Create</button>
+    </div>
+  </form>
+</ng-template>
+<ng-template #confirmDeleteItemModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">Confirmation Required</h4>
+    <button
+      type="button"
+      class="close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('dismiss')"
+    >
+      <span aria-hidden="true">
+        <img src="/assets/svgs/modal-x-ic.svg" alt="X icon" />
+      </span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      Are you sure you want to delete following items?
+      <ul class="mt-2 list-unstyled">
+        <li class="mb-2" *ngFor="let item of selectedMultipleItems">
+          <div class="folder-model-box-sm">
+            <span class="icon">
+              <img
+                src="/assets/svgs/model-box-ic.svg"
+                *ngIf="item.type == 'model'"
+                class="gray-icon mr-1 w16"
+              />
+              <img
+                src="/assets/svgs/folder-ic.svg"
+                *ngIf="item.type == 'folder'"
+                class="gray-icon mr-1 w16"
+              />
+              <img
+                src="/assets/svgs/object-types-layers-ic-small.svg"
+                *ngIf="item.type == 'object'"
+                class="gray-icon mr-1 w16"
+              />
+              <img
+                src="/assets/svgs/metamodel-ic-dark.svg"
+                *ngIf="item.type == 'view'"
+                class="gray-icon mr-1 w16"
+              />
+              <img
+                src="/assets/svgs/diagram-icon-small.svg"
+                *ngIf="item.type == 'diagram'"
+                class="gray-icon mr-1 w16"
+              />
+            </span>
+            <span class="text-bold text-dark">{{ item.name }}</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="modal-footer justify-content-center">
+    <div class="row row-cols-1 row-cols-sm-2 no-gutters m-0">
+      <div class="col pr-sm-2">
+        <button
+          type="button"
+          class="btn transparent-btn w-100"
+          data-dismiss="modal"
+          (click)="modal.dismiss('dismiss')"
+        >
+          No
+        </button>
+      </div>
+      <div class="col pl-sm-2">
+        <button
+          type="button"
+          class="btn btn-red w-100"
+          (click)="onProcessDeleteItem()"
+        >
+          Yes
+        </button>
+      </div>
+    </div>
+    <div class="row mb-4 mt-4" *ngIf="showDeleteDiagramButtonLoading">
+      <img src="/assets/img/loader.gif" class="w24" />
+      Checking diagrams
+    </div>
+    <button
+      type="button"
+      class="btn btn-red w-100"
+      (click)="onProcessDeleteItem(true)"
+      *ngIf="showDeleteDiagramButton"
+    >
+      Delete and Delete from Diagrams
+    </button>
+  </div>
+</ng-template>
+<ng-template #downloadingModal let-modal>
+  <div class="modal-body">
+    <div class="form-group">
+      <div class="text-center mb-4 mt-4">
+        <h4 class="modal-title text-center">
+          <img src="/assets/img/loader.gif" class="w24" />
+          Downloading...
+        </h4>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #permissionsModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">
+      {{ selectedPermissionOptions.name }} Permissions
+    </h4>
+    <button
+      type="button"
+      class="close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('dismiss')"
+    >
+      <span aria-hidden="true">
+        <img src="/assets/svgs/modal-x-ic.svg" alt="X icon" />
+      </span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="permissions-container">
+      <table class="table table-striped table-borderless">
+        <thead>
+          <tr>
+            <th>User Group</th>
+            <th>Read</th>
+            <th>Edit</th>
+            <th>No Access</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of permissions">
+            <td>{{ item.name }}</td>
+            <td>
+              <div class="form-wrap">
+                <div class="check-wrap label-text">
+                  <input
+                    type="checkbox"
+                    [name]="'read_' + item.id"
+                    [id]="'read_' + item.id"
+                    [checked]="item.can_read"
+                    (change)="onPermissionUpdate($event, item.id, 'read')"
+                  />
+                  <div class="checkbox"></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="form-wrap">
+                <div class="check-wrap label-text">
+                  <input
+                    type="checkbox"
+                    [name]="'edit_' + item.id"
+                    [id]="'edit_' + item.id"
+                    [checked]="item.can_edit"
+                    (change)="onPermissionUpdate($event, item.id, 'edit')"
+                  />
+                  <div class="checkbox"></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="form-wrap">
+                <div class="check-wrap label-text">
+                  <input
+                    type="checkbox"
+                    [name]="'no_access_' + item.id"
+                    [id]="'no_access_' + item.id"
+                    [checked]="item.no_access"
+                    (change)="onPermissionUpdate($event, item.id, 'no_access')"
+                  />
+                  <div class="checkbox"></div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-footer justify-content-center">
+      <a
+        class="cursor-pointer text-dark"
+        *ngIf="permissionsCurrentPage < permissionsMaxPage"
+        (click)="loadMorePermissions(this.permissionsCurrentPage + 1)"
+      >
+        <dfn class="d-none d-md-inline-block">Load More</dfn>
+      </a>
+    </div>
+  </div>
+</ng-template>
+<ng-template #organizeProcessingModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">Organizing {{ organizeModel.name }}</h4>
+  </div>
+  <div class="modal-body text-center mb-2">
+    <span class="mb-2">
+      <img src="/assets/img/loader.gif" class="w18" />
+      Processing...
+    </span>
+  </div>
+</ng-template>

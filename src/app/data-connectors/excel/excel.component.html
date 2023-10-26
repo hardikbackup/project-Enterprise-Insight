@@ -1,0 +1,924 @@
+<app-master-layout></app-master-layout>
+<div class="content-wrapper object-types-contents">
+  <div class="content-wrapper__data-title">
+    <div class="row data-highlight d-flex align-items-center m-0">
+      <div
+        class="title-holder col-lg-auto col-12 d-flex align-items-center p-0"
+      >
+        <span>
+          <img class="default-icon" src="/assets/svgs/file-text-ic.svg" />
+          <img class="hover-icon" src="/assets/svgs/file-text-ic-red.svg" />
+        </span>
+        <h3>Excel</h3>
+      </div>
+      <div
+        class="btn-wrapper action-triger-wrap btn__inline col-lg-auto col-6 col-md-12 mt-3 mt-md-4 mt-lg-0 d-flex justify-content-xl-end p-0 ml-auto"
+      >
+        <a
+          (click)="onDiscardExcelImport()"
+          *ngIf="excelSheetImportTab != 'init'"
+          class="btn ml-sm-auto ml-md-0 ml-lg-auto transparent-btn"
+        >
+          <img
+            src="/assets/svgs/discard-trash-ic.svg"
+            alt="Trash icon"
+            class="icon"
+          />
+          Discard
+        </a>
+        <a
+          class="btn transparent-btn fill"
+          *ngIf="excelSheetImportTab == 'init'"
+          (click)="onExcelFileEditor()"
+        >
+          <img
+            src="/assets/svgs/arrow-white-right.svg"
+            alt="Next icon"
+            class="icon mr-1"
+          />
+          Next
+        </a>
+        <a
+          *ngIf="excelSheetImportTab == 'editor'"
+          (click)="onMakeNewSheet()"
+          class="btn transparent-btn medium"
+        >
+          <span class="icon-wrap">
+            <img
+              class="default-icon"
+              src="/assets/svgs/plus-ic.svg"
+              alt="Plus icon "
+            />
+            <img
+              class="dark-active"
+              src="/assets/svgs/plus-ic-white.svg"
+              alt="Plus icon Red"
+            />
+          </span>
+          <span class="d-md-none icon-wrap">
+            <img
+              class="default-icon"
+              src="/assets/svgs/object-type-layers-ic.svg"
+              alt="folder icon "
+            />
+            <img
+              class="dark-active"
+              src="/assets/svgs/object-type-layers-ic-red.svg"
+              alt="folder icon "
+            />
+          </span>
+          <dfn class="d-none d-md-block">Map New Sheet</dfn>
+        </a>
+        <ng-container
+          *ngIf="!excelSheetImportProcessing && !excelSheetImported"
+        >
+          <button
+            type="button"
+            class="btn transparent-btn"
+            *ngIf="excelSheetImportTab == 'import'"
+            (click)="onExcelEditorImportBack()"
+          >
+            <img
+              src="/assets/svgs/arrow-gray-left.svg"
+              alt="Save icon"
+              class="icon mr-1 transform-180"
+            />
+            Back
+          </button>
+          <button
+            type="button"
+            class="btn transparent-btn fill"
+            *ngIf="excelSheetImportTab == 'editor'"
+            (click)="onExcelEditorImportTab()"
+          >
+            <img
+              src="/assets/svgs/arrow-white-right.svg"
+              alt="Save icon"
+              class="icon mr-1"
+            />
+            Next
+          </button>
+          <button
+            type="button"
+            class="btn transparent-btn"
+            *ngIf="excelSheetImportTab == 'import'"
+            (click)="onExcelEditorImport('save')"
+          >
+            <img
+              src="/assets/svgs/save-ic-gray.svg"
+              alt="Save icon"
+              class="icon mr-1"
+            />
+            Save
+          </button>
+          <button
+            type="button"
+            class="btn transparent-btn fill"
+            *ngIf="excelSheetImportTab == 'import'"
+            (click)="onExcelEditorImport('import')"
+          >
+            <img
+              src="/assets/img/double-arrow-right.png"
+              alt="Save icon"
+              class="icon mr-1 w12"
+            />
+            Save and Run
+          </button>
+        </ng-container>
+        <div class="mt-1" *ngIf="excelSheetImportProcessing">
+          <img src="/assets/img/loader.gif" class="w24" />
+        </div>
+        <a
+          *ngIf="totalExcelImportCheckedItems()"
+          (click)="onDeleteMultipleExcelImports()"
+          class="btn transparent-btn medium ml-0"
+        >
+          <span class="icon-wrap">
+            <img
+              class="default-icon"
+              src="/assets/svgs/trash-ic.svg"
+              alt="Trash icon "
+            />
+            <img
+              class="dark-active"
+              src="/assets/svgs/trash-ic-white.svg"
+              alt="Trash icon Red"
+            />
+          </span>
+          <dfn class="d-none d-md-block"
+            >Delete Selected ({{ totalExcelImportCheckedItems() }})</dfn
+          >
+        </a>
+      </div>
+    </div>
+    <div
+      class="row m-0 data-trigger d-flex align-items-center"
+      *ngIf="currentActiveTab == 'excel_import'"
+    >
+      <div class="col-md-8 col-sm-12 px-0 breadcrumb-info d-none d-md-block">
+        <div class="breadcrumbs">
+          <a routerLink="/data-connectors">API</a>
+          <a
+            (click)="onExcelEditorImportBack()"
+            [ngClass]="{ active: excelSheetImportTab == 'editor' }"
+            >Map Data in Excel</a
+          >
+          <a
+            (click)="onExcelEditorImportTab()"
+            class="active"
+            *ngIf="excelSheetImportTab == 'import'"
+            >Run Import</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="content-details list-view">
+    <div class="type-editor-content tween-col">
+      <div class="row">
+        <div class="col-12">
+          <div class="item-nav mb-0">
+            <ng-container *ngIf="adminUser">
+              <a routerLink="/data-connectors" class="cursor-pointer"
+                >API Clients</a
+              >
+            </ng-container>
+            <a routerLink="/data-connectors/excel" class="cursor-pointer active"
+              >Excel</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row m-0">
+      <div class="col-12 px-0 data-nav">
+        <ng-container *ngIf="currentActiveTab == 'excel'">
+          <ng-container *ngIf="isLoading">
+            <div class="mb-3 ml-4">
+              <img src="/assets/img/loader.gif" class="w24" />
+            </div>
+          </ng-container>
+          <ng-container *ngIf="!isLoading">
+            <div class="type-editor-content new-attribute-types p-0">
+              <div class="row">
+                <div class="col-12 options-col">
+                  <div class="options-wrap transparent-bg h-150p">
+                    <div class="header">
+                      <div class="row field-row">
+                        <div class="col-md-12 type-name mb-2">
+                          <form [formGroup]="importPreForm">
+                            <div class="form-group">
+                              <label for="name">Name of Import</label>
+                              <input
+                                type="text"
+                                class="form-control"
+                                formControlName="name"
+                                id="name"
+                              />
+                              <span
+                                class="position-absolute red"
+                                *ngIf="
+                                  hasImportPreFormSubmitted &&
+                                  !importPreForm.controls.name.valid
+                                "
+                                >Required</span
+                              >
+                            </div>
+                          </form>
+                        </div>
+                        <div class="col-md-12 type-name text-center">
+                          <a
+                            *ngIf="!preSelectedFileName"
+                            class="p-1 mb-0 cursor-pointer"
+                            (click)="onFetchExcelData()"
+                          >
+                            Browse to File Structure on Machine, excel file name
+                            appear here
+                          </a>
+                          <p *ngIf="preSelectedFileName" class="p-1 mb-0">
+                            {{ preSelectedFileName }}
+                            <a
+                              (click)="onExcelFileRemove()"
+                              class="cursor-pointer position-relative top-n-8"
+                            >
+                              <img
+                                src="/assets/svgs/nav-x-ic.svg"
+                                alt="X icon"
+                              />
+                            </a>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+        <ng-container *ngIf="currentActiveTab == 'excel_import'">
+          <div class="row">
+            <div class="col-2">
+              <div class="card br-7">
+                <div class="card-body">
+                  <p class="text-bold">File Selection</p>
+                  <ul class="list-unstyled">
+                    <li
+                      *ngFor="let item of excelSheets; let i = index"
+                      class="mb-2"
+                    >
+                      <a
+                        href="#"
+                        [ngClass]="{ 'text-bold': selectedSheetIndex == i }"
+                        (click)="onExcelSheetSelect(i)"
+                        >{{ item.name }}</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-10">
+              <div
+                class="card br-7"
+                [ngClass]="{ 'd-none': excelSheetImportTab == 'import' }"
+              >
+                <div class="card-body">
+                  <form [formGroup]="mappingForm">
+                    <div class="row">
+                      <div class="col-3">
+                        <div class="form-group select-wrapper">
+                          <ng-select
+                            class="ng-dropdown"
+                            formControlName="type"
+                            [items]="mappingTypes"
+                            [searchable]="false"
+                            [clearable]="false"
+                            [placeholder]="'Object'"
+                            bindLabel="name"
+                            bindValue="id"
+                            (change)="onSheetTypeChange($event)"
+                          ></ng-select>
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group select-wrapper">
+                          <ng-select
+                            class="ng-dropdown"
+                            formControlName="source_model_id"
+                            [items]="sourceModels"
+                            [searchable]="true"
+                            [clearable]="false"
+                            [placeholder]="'Source Model'"
+                            bindLabel="name"
+                            bindValue="id"
+                            (search)="onSourceModelSearch($event)"
+                            (change)="onSheetSourceModelChange($event)"
+                          ></ng-select>
+                        </div>
+                      </div>
+                      <div
+                        class="col-3"
+                        [ngClass]="{
+                          'd-none': mappingForm.controls.type.value == 'object'
+                        }"
+                      >
+                        <div class="form-group select-wrapper">
+                          <ng-select
+                            class="ng-dropdown"
+                            formControlName="target_model_id"
+                            [items]="targetModels"
+                            [searchable]="true"
+                            [clearable]="false"
+                            [placeholder]="'Target Model'"
+                            bindLabel="name"
+                            bindValue="id"
+                            (search)="onTargetModelSearch($event)"
+                            (change)="onSheetTargetModelChange($event)"
+                          ></ng-select>
+                        </div>
+                      </div>
+                      <div
+                        class="col-3"
+                        [ngClass]="{
+                          'd-none':
+                            mappingForm.controls.type.value == 'relationship'
+                        }"
+                      >
+                        <div class="col-auto select-wrap">
+                          <div class="custom-control custom-switch">
+                            <input
+                              type="checkbox"
+                              class="custom-control-input"
+                              id="has_headers"
+                              formControlName="has_headers"
+                              value="1"
+                              (change)="onHasHeadersChange($event)"
+                            />
+                            <label
+                              class="custom-control-label has-headers-label"
+                              for="has_headers"
+                              >My Data has headers</label
+                            >
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="col-auto select-wrap">
+                          <div class="custom-control custom-switch">
+                            <input
+                              type="checkbox"
+                              class="custom-control-input"
+                              id="reuse_objects"
+                              formControlName="reuse_objects"
+                              (change)="onReuseObjectsChange($event)"
+                            />
+                            <label
+                              class="custom-control-label has-headers-label"
+                              for="reuse_objects"
+                              >Re-Use
+                              {{
+                                mappingForm.controls.type.value == "object"
+                                  ? "Objects"
+                                  : "Relationships"
+                              }}</label
+                            >
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <table
+                      class="table table-bordered"
+                      *ngIf="selectedSheetIndex != -1"
+                    >
+                      <thead>
+                        <tr>
+                          <td
+                            *ngFor="
+                              let c of [].constructor(
+                                excelSheets[selectedSheetIndex].options
+                                  .max_columns
+                              );
+                              let i = index
+                            "
+                          >
+                            <ng-select
+                              class="ng-dropdown"
+                              [formControlName]="'col_' + i"
+                              [items]="getAttributes(i)"
+                              [searchable]="true"
+                              [clearable]="false"
+                              [placeholder]="'Select'"
+                              bindLabel="name"
+                              bindValue="id"
+                              groupBy="group"
+                              (search)="onCellAttributesSearch($event, i)"
+                              (change)="onCellColumnChanged($event, i)"
+                            >
+                              <ng-template ng-optgroup-tmp let-item="item">
+                                {{ item.group }}
+                              </ng-template>
+                              <ng-template ng-option-tmp let-item="item">
+                                {{ item.name }}
+                              </ng-template>
+                            </ng-select>
+                          </td>
+                        </tr>
+                        <tr
+                          *ngIf="excelSheets[selectedSheetIndex].items.length"
+                        >
+                          <th
+                            *ngFor="
+                              let c of [].constructor(
+                                excelSheets[selectedSheetIndex].options
+                                  .max_columns
+                              );
+                              let i = index
+                            "
+                          >
+                            {{
+                              excelSheets[selectedSheetIndex].options
+                                .has_headers
+                                ? displayCellData(
+                                    excelSheets[selectedSheetIndex].items[0][i]
+                                  )
+                                : "Column " + (i + 1)
+                            }}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          *ngFor="
+                            let item of excelSheets[selectedSheetIndex].items;
+                            let j = index
+                          "
+                          [ngClass]="{
+                            'd-none':
+                              j == 0 &&
+                              excelSheets[selectedSheetIndex].options
+                                .has_headers
+                          }"
+                        >
+                          <td
+                            *ngFor="
+                              let c of [].constructor(
+                                excelSheets[selectedSheetIndex].options
+                                  .max_columns
+                              );
+                              let i = index
+                            "
+                          >
+                            {{ displayCellData(item[i]) }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </form>
+                </div>
+              </div>
+              <form
+                [formGroup]="importForm"
+                [ngClass]="{ 'd-none': excelSheetImportTab == 'editor' }"
+              >
+                <div class="type-editor-content new-attribute-types p-0">
+                  <div class="row">
+                    <div class="col-12 options-col">
+                      <div class="options-wrap transparent-bg h-100p">
+                        <div class="header">
+                          <div class="row field-row">
+                            <div class="col-md-12 type-name">
+                              <div class="form-group">
+                                <label for="name">Import Name</label>
+                                <input
+                                  type="text"
+                                  class="form-control"
+                                  formControlName="name"
+                                  id="name"
+                                />
+                                <span
+                                  class="position-absolute red"
+                                  *ngIf="
+                                    hasImportFormSubmitted &&
+                                    !importForm.controls.name.valid
+                                  "
+                                  >Required</span
+                                >
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        class="options-wrap transparent-bg"
+                        *ngIf="showExcelExportResults()"
+                      >
+                        <div class="header">
+                          <div class="row field-row">
+                            <div class="col-md-12 type-name">
+                              <div class="form-group">
+                                <label for="name">Report</label>
+                                <ul class="list-unstyled mb-0">
+                                  <li>
+                                    Objects Created:
+                                    {{ excelExportResults.objects_created }}
+                                  </li>
+                                  <li
+                                    *ngFor="
+                                      let item of excelExportResults.models
+                                    "
+                                  >
+                                    [{{ item.name }}]: {{ item.total }}
+                                  </li>
+                                  <li>
+                                    Relationships Created:
+                                    {{
+                                      excelExportResults.relationships_created
+                                    }}
+                                  </li>
+                                  <li>
+                                    Attributes Created:
+                                    {{ excelExportResults.attributes_created }}
+                                  </li>
+                                  <li>
+                                    Failed Creations:
+                                    {{ excelExportResults.failed_creations }}
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </ng-container>
+        <table
+          class="table"
+          [ngClass]="{ 'd-none': excelSheetImportTab != 'init' }"
+        >
+          <thead class="list-item list-heading">
+            <tr class="data-highlight-info">
+              <th style="padding-left: 0px">
+                <div class="d-flex align-items-center">
+                  <div class="check-wrap">
+                    <input
+                      type="checkbox"
+                      id="select-all"
+                      (change)="selectAllRecords($event)"
+                      [checked]="isAllReSelected"
+                    />
+                    <label for="select-all"></label>
+                  </div>
+                  <div
+                    (click)="sortBy('name')"
+                    class="cursor-pointer"
+                    style="padding-left: 24px"
+                  >
+                    Name
+                    <button class="btn btn-sort">
+                      <img
+                        src="/assets/svgs/chevron-up-ic.svg"
+                        *ngIf="defaultSort == 'name_asc'"
+                      />
+                      <img
+                        src="/assets/svgs/chevron-down-ic.svg"
+                        *ngIf="defaultSort == 'name_desc'"
+                      />
+                    </button>
+                  </div>
+                </div>
+              </th>
+              <th
+                class="created-on cursor-pointer"
+                (click)="sortBy('import_date')"
+              >
+                Last Import Date
+                <button class="btn btn-sort">
+                  <img
+                    src="/assets/svgs/chevron-down-ic.svg"
+                    *ngIf="defaultSort == 'import_date_desc'"
+                  />
+                  <img
+                    src="/assets/svgs/chevron-up-ic.svg"
+                    *ngIf="defaultSort == 'import_date_asc'"
+                  />
+                </button>
+              </th>
+              <th class="created-on cursor-pointer" (click)="sortBy('created')">
+                Created On
+                <button class="btn btn-sort">
+                  <img
+                    src="/assets/svgs/chevron-down-ic.svg"
+                    *ngIf="defaultSort == 'created_date_desc'"
+                  />
+                  <img
+                    src="/assets/svgs/chevron-up-ic.svg"
+                    *ngIf="defaultSort == 'created_date_asc'"
+                  />
+                </button>
+              </th>
+              <th
+                class="last-updated cursor-pointer"
+                (click)="sortBy('updated')"
+              >
+                Updated On
+                <button class="btn btn-sort">
+                  <img
+                    src="/assets/svgs/chevron-down-ic.svg"
+                    *ngIf="defaultSort == 'updated_date_desc'"
+                  />
+                  <img
+                    src="/assets/svgs/chevron-up-ic.svg"
+                    *ngIf="defaultSort == 'updated_date_asc'"
+                  />
+                </button>
+              </th>
+              <th
+                class="created-by cursor-pointer"
+                (click)="sortBy('created_by')"
+              >
+                Created By
+                <button class="btn btn-sort">
+                  <img
+                    src="/assets/svgs/chevron-down-ic.svg"
+                    *ngIf="defaultSort == 'created_by_desc'"
+                  />
+                  <img
+                    src="/assets/svgs/chevron-up-ic.svg"
+                    *ngIf="defaultSort == 'created_by_asc'"
+                  />
+                </button>
+              </th>
+              <th
+                class="created-on cursor-pointer"
+                (click)="sortBy('updated_by')"
+              >
+                Last Updated By
+                <button class="btn btn-sort">
+                  <img
+                    src="/assets/svgs/chevron-down-ic.svg"
+                    *ngIf="defaultSort == 'updated_by_desc'"
+                  />
+                  <img
+                    src="/assets/svgs/chevron-up-ic.svg"
+                    *ngIf="defaultSort == 'updated_by_asc'"
+                  />
+                </button>
+              </th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              class="list-item"
+              *ngFor="let item of excel_imports"
+              (contextmenu)="onExcelImportOptions($event, item, true)"
+            >
+              <td class="data-call">
+                <div class="d-flex align-items-center">
+                  <div class="check-wrap">
+                    <input
+                      type="checkbox"
+                      [id]="'excel_import_item_' + item.id"
+                      (change)="checkExcelImportItem($event, item)"
+                      [checked]="excelImportCheckedItems[item.id]"
+                    />
+                    <label [for]="'excel_import_item_' + item.id"></label>
+                  </div>
+                  <div class="title-holder d-flex align-items-center w-100">
+                    <span class="cursor-pointer" [routerLink]="'/'">
+                      <img
+                        src="/assets/svgs/file-text-ic.svg"
+                        class="static-icon"
+                      />
+                      <img
+                        src="/assets/svgs/file-text-ic-red.svg"
+                        class="dark-active"
+                      />
+                    </span>
+                    <ng-container *ngIf="renameExcelImportData.id !== item.id">
+                      <dfn
+                        [routerLink]="'/data-connectors/excel/' + item.id"
+                        class="cursor-pointer"
+                        >{{ item.name }}</dfn
+                      >
+                    </ng-container>
+                    <div
+                      class="form-group w-100"
+                      *ngIf="renameExcelImportData.id == item.id"
+                    >
+                      <input
+                        type="text"
+                        class="form-control"
+                        [id]="'rename_' + item.id"
+                        [value]="item.name"
+                        (keyup)="onRenameKeyup($event, item)"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td
+                class="created-on cursor-pointer"
+                [routerLink]="'/data-connectors/excel/' + item.id"
+              >
+                {{ item.imported_date }}
+              </td>
+              <td
+                class="created-on cursor-pointer"
+                [routerLink]="'/data-connectors/excel/' + item.id"
+              >
+                {{ item.created_date }}
+              </td>
+              <td
+                class="last-updated cursor-pointer"
+                [routerLink]="'/data-connectors/excel/' + item.id"
+              >
+                {{ item.updated_date }}
+              </td>
+              <td
+                class="created-by cursor-pointer"
+                [routerLink]="'/data-connectors/excel/' + item.id"
+              >
+                {{ item.created_by }}
+              </td>
+              <td
+                class="created-on cursor-pointer"
+                [routerLink]="'/data-connectors/excel/' + item.id"
+              >
+                {{ item.updated_by }}
+              </td>
+              <td>
+                <div class="float-right position-relative">
+                  <div
+                    class="action-hold d-flex align-items-center"
+                    [ngClass]="{
+                      'options-shown':
+                        excelImportExpandOptions.id == item.id &&
+                        excelImportExpandOptions.type == 'fixed'
+                    }"
+                  >
+                    <button
+                      class="more-btn action-btn"
+                      [ngClass]="{
+                        active: excelImportExpandOptions.id == item.id
+                      }"
+                      (click)="onExcelImportOptions($event, item, false)"
+                    >
+                      <img
+                        src="/assets/svgs/more-vertical-ic-2.svg"
+                        alt="More icon"
+                      />
+                    </button>
+                    <div class="dropdown-wrap">
+                      <div class="dropdown-info rightBoxHeight">
+                        <button (click)="renameExcelImport(item)">
+                          Rename
+                        </button>
+                        <button (click)="deleteExcelImport(item)">
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <div
+                class="float-right position-relative"
+                style="{{
+                  excelImportExpandOptions.id == item.id &&
+                  excelImportExpandOptions.type == 'float'
+                    ? 'right:' + excelImportExpandOptions.right + 'px;'
+                    : ''
+                }}"
+              >
+                <div
+                  class="action-hold d-flex align-items-center"
+                  [ngClass]="{
+                    'options-shown float-menu-no-box':
+                      excelImportExpandOptions.id == item.id &&
+                      excelImportExpandOptions.type == 'float'
+                  }"
+                >
+                  <div class="dropdown-wrap">
+                    <div class="dropdown-info rightBoxHeight">
+                      <button (click)="renameExcelImport(item)">Rename</button>
+                      <button (click)="deleteExcelImport(item)">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </tr>
+          </tbody>
+        </table>
+        <div class="load-more-wrap" *ngIf="currentPage && currentPage < pages">
+          <section *ngIf="isLoadingExcelImports" class="mt-1">
+            <img
+              src="/assets/img/loader.gif"
+              class="w24 vertical-align-middle mr-1"
+            />
+            <b>Loading</b>
+          </section>
+          <button
+            class="btn"
+            (click)="loadExcelImports(currentPage + 1)"
+            *ngIf="!isLoadingExcelImports"
+          >
+            Load more
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<input
+  type="file"
+  id="excel_import"
+  class="d-none"
+  accept=".xls, .xlsx"
+  (change)="onExcelFetchProcess($event)"
+  #excelFetchEl
+/>
+<ng-template #excelFetchProcessingModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">Processing</h4>
+  </div>
+  <div class="modal-body">
+    <div class="text-center mb-3">
+      <img src="/assets/img/loader.gif" class="w24" />
+    </div>
+  </div>
+</ng-template>
+<ng-template #confirmDeleteExcelImportItemModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">Confirmation Required</h4>
+    <button
+      type="button"
+      class="close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('dismiss')"
+    >
+      <span aria-hidden="true">
+        <img src="/assets/svgs/modal-x-ic.svg" alt="X icon" />
+      </span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      Are you sure you want to delete following item(s)?
+      <ul class="mt-2 list-unstyled">
+        <ng-container *ngIf="!deleteSingleItem">
+          <li
+            class="mb-1"
+            *ngFor="
+              let item of excelImportCheckedItems | keyvalue;
+              let index = index
+            "
+          >
+            <div class="folder-model-box-sm no-border">
+              <span class="text-bold text-dark">
+                {{ item.value.name }}
+              </span>
+            </div>
+          </li>
+        </ng-container>
+        <li class="mb-1" *ngIf="deleteSingleItem">
+          <div class="folder-model-box-sm no-border">
+            <span class="text-bold text-dark">
+              {{ deleteSingleItemData.name }}
+            </span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="modal-footer justify-content-center">
+    <div class="row row-cols-1 row-cols-sm-2 no-gutters m-0">
+      <div class="col pr-sm-2">
+        <button
+          type="button"
+          class="btn transparent-btn w-100"
+          data-dismiss="modal"
+          (click)="modal.dismiss('dismiss')"
+        >
+          No
+        </button>
+      </div>
+      <div class="col pl-sm-2">
+        <button
+          type="button"
+          class="btn btn-red w-100"
+          (click)="processExcelImportDelete()"
+        >
+          Yes
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>

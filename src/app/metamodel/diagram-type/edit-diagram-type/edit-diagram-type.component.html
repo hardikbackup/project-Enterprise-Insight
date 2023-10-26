@@ -1,0 +1,365 @@
+<app-master-layout></app-master-layout>
+<div class="content-wrapper types-editor relationship-types-2 diagram-type">
+    <div class="content-wrapper__data-title">
+        <div class="row data-highlight d-flex align-items-center m-0">
+            <div class="title-holder col-lg-auto col-12 col-sm-6 d-flex align-items-center pl-0">
+                <button class="btn back-btn" routerLink="/metamodel/diagram-type">
+                    <img class="default-icon" src="/assets/svgs/arrow-left-ic.svg" alt="Left arrow">
+                    <img class="hover-icon" src="/assets/svgs/arrow-left-ic-red.svg" alt="Left arrow red">
+                </button>
+                <h3>Diagram Type Editor</h3>
+            </div>
+            <div class="btn-wrapper action-triger-wrap transparent-btn btn__inline d-flex align-items-center col-lg-auto col-12 mt-md-3 mt-lg-0 p-0 ml-sm-auto  justify-content-start justify-content-lg-end">
+                <button type="button" class="btn transparent-btn" routerLink="/metamodel/diagram-type" *ngIf="!isLoading">
+                    <img src="/assets/svgs/trash-ic.svg" alt="Trash icon" class="icon">
+                    Discard
+                </button>
+                <button class="btn transparent-btn" type="button" (click)="onOpenLibraryImportModal()" *ngIf="diagramTypeId">
+                    <img src="/assets/svgs/import-ic.svg" alt="Import icon" class="icon">
+                    Import library
+                </button>
+                <button class="btn transparent-btn fill" type="button" (click)="onDiagramTypeCombinationUpdate()" *ngIf="!isLoading">
+                    <img src="/assets/svgs/save-ic-white.svg" alt="Save icon" class="icon">
+                    Save
+                </button>
+                <div *ngIf="isLoading">
+                    <img src="/assets/img/loader.gif" class="w24">
+                    Processing your request
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="type-editor-content tween-col">
+        <div class="row">
+            <div class="col-12">
+                <div class="item-nav">
+                    <a href="#" [ngClass]="{ 'active': currentActiveTab == 'shape_types' }" (click)="onTabChange('shape_types')">Shape Types</a>
+                    <a href="#" [ngClass]="{ 'active': currentActiveTab == 'connectors' }" (click)="onTabChange('connectors')">Connectors</a>
+                </div>
+            </div>
+        </div>
+        <div class="row no-gutters" [ngClass]="{ 'display-hidden': currentActiveTab != 'shape_types' }">
+            <div class="col-12 col-lg-auto options-col">
+                <section class="options-wrap">
+                    <div class="header">
+                        <div class="row no-gutters">
+                            <div class="col-12 type-name">
+                                <div class="form-group">
+                                    <label for="name">Diagram Type Name</label>
+                                    <input type="text" class="form-control" [(ngModel)]="diagramTypeName" id="name">
+                                    <span class="position-absolute red" *ngIf="firstLoad && !diagramTypeName.length">Required</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-12 first-column">
+                            <p class="lead-text">Library List</p>
+                            <div class="scrollable-contents">
+                                <div *ngIf="isShapeLibraryLoading">
+                                    <img src="/assets/img/loader.gif" class="w24">
+                                </div>
+                                <section *ngIf="libraries">
+                                    <ng-container *ngFor="let item of libraries">
+                                        <div class="form-group d-flex align-items-center">
+                                            <div class="check-wrap label-text">
+                                                <input type="checkbox" [id]="'lib_item_' + item.id" [name]="'lib_item_' + item.id" [checked]="selectedLibraries.indexOf(item.id) == -1 ? false : true" (change)="onLibraryCheck($event, item.id)">
+                                                <label [for]="'lib_item_' + item.id">{{ item.name }}</label>
+                                                <div class="checkbox"></div>
+                                                <button type="button" class="btn remove-btn" (click)="onDeleteLibrary(item.id)">
+                                                    <img src="/assets/svgs/close-icon-gray.svg" alt="Close icon">
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                </section>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12 second-column">
+                            <p class="lead-text">List of shape types</p>
+                            <div class="scrollable-contents">
+                                <ng-container *ngIf="libraries">
+                                    <ng-container *ngFor="let item of libraries">
+                                        <ng-container *ngIf="selectedLibraries.indexOf(item.id) !== -1">
+                                            <div class="form-group" *ngFor="let shape_item of item.shapes; let index = index">
+                                                <ng-container *ngIf="!shape_item.is_edge">
+                                                    <div class="check-wrap radio-item label-text shape-display-item">
+                                                        <input type="checkbox" [id]="'shape_type_' + shape_item.id" [checked]="selectedShapeType && selectedShapeType.id == shape_item.id ? true : false" [name]="'shape_type_' + shape_item.id" (change)="onShapeTypeCheck($event, shape_item, item.id)">
+                                                        <label [title]="shape_item.name" [for]="'shape_type_' + shape_item.id">{{ shape_item.name }}</label>
+                                                        <button class="btn transparent-btn shape-preview-btn">
+                                                            <img src="/assets/png/image-ic.png" alt="Image icon">
+                                                        </button>
+                                                        <div [innerHTML]="onRenderSafeSVG(shape_item.svg)" class="shape-preview-container"></div>
+                                                        <div class="checkbox"></div>
+                                                    </div>
+                                                </ng-container>
+                                            </div>
+                                        </ng-container>
+                                    </ng-container>
+                                </ng-container>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12 third-column">
+                            <p class="lead-text">List of object types</p>
+                            <div class="scrollable-contents">
+                                <section *ngIf="objectTypes">
+                                    <ng-container>
+                                        <div class="form-group" *ngFor="let item of objectTypes">
+                                            <div class="check-wrap radio-item label-text">
+                                                <input type="checkbox" [id]="'obj_type_' + item.id" [checked]="selectedObjectType.id == item.id ? true : false" [name]="'obj_type_' + item.id" (change)="onObjectTypeCheck($event, item)">
+                                                <label [title]="item.name" [for]="'obj_type_' + item.id">{{ item.name}}</label>
+                                                <div class="checkbox"></div>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                    <a href="" *ngIf="objectTypesMaxPages > objectTypesCurrentPage" (click)="onLoadMoreObjectTypes()">Load More</a>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <div class="col-12 col-lg-auto options-col combination-col">
+                <div class="order-btn-wrap">
+                    <button type="button" class="btn btn-prev" (click)="onDeleteCombination()">
+                        <img src="/assets/svgs/arrow-left-ic-sm.svg" alt="Arrow left small" class="gray-icon">
+                        <img src="/assets/svgs/arrow-left-ic-sm-red.svg" alt="Arrow left small" class="red-icon">
+                    </button>
+                    <button type="button" class="btn btn-next" (click)="onAddCombination()">
+                        <img src="/assets/svgs/arrow-right-ic-sm.svg" alt="Arrow right small" class="gray-icon">
+                        <img src="/assets/svgs/arrow-right-ic-sm-red.svg" alt="Arrow right small red" class="red-icon">
+                    </button>
+                </div>
+                <div class="options-wrap">
+                    <span>Combination</span>
+                    <div class="combination-info">
+                        <div class="row no-gutters title-row">
+                            <div class="col-6">
+                                <span>From</span>
+                            </div>
+                            <div class="col-6">
+                                <span>To</span>
+                            </div>
+                        </div>
+                        <div class="info-body">
+                            <section *ngIf="combinations">
+                                <div class="row no-gutters" *ngFor="let item of combinations; let index = index">
+                                    <div class="col-6">
+                                        <div class="form-wrap">
+                                            <div class="check-wrap label-text shape-display-item">
+                                                <input type="checkbox" [id]="'item_combination_' + index" [name]="'item_combination_' + index" (change)="onCombinationCheck($event,item,index)">
+                                                <label [for]="'item_combination_' + index">
+                                                    {{ item.shape_type_name ? item.shape_type_name : item.library_name }}
+                                                </label>
+                                                <button class="btn transparent-btn shape-preview-btn mr-2">
+                                                    <img src="/assets/png/image-ic.png" alt="Image icon">
+                                                </button>
+                                                <div [innerHTML]="onRenderSafeSVG(item.shape_type_svg)" class="shape-preview-container"></div>
+                                                <div class="checkbox"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        {{ item.object_type_name }}
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row no-gutters dual-list-box" [ngClass]="{ 'display-hidden' : currentActiveTab != 'connectors' }">
+            <div class="col-12 col-lg-auto options-col">
+                <div class="options-wrap">
+                    <div class="row">
+                        <div class="col-md-4 col-12 first-column">
+                            <p class="lead-text">Library List</p>
+                            <div *ngIf="isConnectorLibraryLoading">
+                                <img src="/assets/img/loader.gif" class="w24">
+                            </div>
+                            <div class="scrollable-contents">
+                                <section *ngIf="libraries">
+                                    <ng-container *ngFor="let item of libraries">
+                                        <div class="form-group d-flex align-items-center">
+                                            <div class="check-wrap label-text">
+                                                <input type="checkbox" [id]="'connector_lib_item_' + item.id" [name]="'connector_lib_item_' + item.id" [checked]="selectedLibraries.indexOf(item.id) == -1 ? false : true" (change)="onLibraryCheck($event, item.id)">
+                                                <label [for]="'connector_lib_item_' + item.id">{{ item.name }}</label>
+                                                <div class="checkbox"></div>
+                                            </div>
+                                            <button type="button" class="btn remove-btn" (click)="onDeleteLibrary(item.id)">
+                                                <img src="/assets/svgs/close-icon-gray.svg" alt="Close icon">
+                                            </button>
+                                        </div>
+                                    </ng-container>
+                                </section>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12 second-column">
+                            <p class="lead-text">List of shape types</p>
+                            <div class="scrollable-contents">
+                                <section *ngIf="libraries">
+                                    <ng-container *ngFor="let item of libraries">
+                                        <ng-container *ngIf="selectedLibraries.indexOf(item.id) !== -1">
+                                            <div class="form-group" *ngFor="let shape_item of item.shapes; let index = index">
+                                                <div class="check-wrap radio-item label-text shape-display-item connector_shape_item" *ngIf="shape_item.is_edge">
+                                                    <input type="checkbox" [id]="'relationship_shape_type_' + shape_item.id" [checked]="selectedConnectorShapeType && selectedConnectorShapeType.id == shape_item.id ? true : false" [name]="'relationship_shape_type_' + shape_item.id" (change)="onRelationshipShapeTypeCheck($event, shape_item, item)">
+                                                    <label [for]="'relationship_shape_type_' + shape_item.id">{{ shape_item.name  }}</label>
+                                                    <button class="btn transparent-btn shape-preview-btn">
+                                                        <img src="/assets/png/image-ic.png" alt="Image icon">
+                                                    </button>
+                                                    <div [innerHTML]="onRenderSafeSVG(shape_item.svg)" class="shape-preview-container"></div>
+                                                    <div class="checkbox"></div>
+                                                </div>
+                                            </div>
+                                        </ng-container>
+                                    </ng-container>
+                                </section>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12 third-column">
+                            <p class="lead-text">List of relationship types</p>
+                            <div class="scrollable-contents">
+                                <section *ngIf="relationshipTypes">
+                                    <ng-container>
+                                        <div class="form-group" *ngFor="let item of relationshipTypes">
+                                            <div class="check-wrap radio-item label-text">
+                                                <input type="checkbox" [id]="'relationship_type_' + item.id" [checked]="selectedRelationshipType && selectedRelationshipType.id == item.id ? true : false" [name]="'relationship_type_' + item.id" (change)="onRelationshipTypeCheck($event, item)">
+                                                <label [for]="'relationship_type_' + item.id">{{ item.name}}</label>
+                                                <div class="checkbox"></div>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                    <a href="" *ngIf="relationshipTypesMaxPages > relationshipTypesCurrentPage" (click)="onLoadMoreRelationshipTypes()">Load More</a>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-auto options-col combination-col">
+                <div class="order-btn-wrap">
+                    <button type="button" class="btn btn-prev" (click)="onDeleteConnectorCombination()">
+                        <img src="/assets/svgs/arrow-left-ic-sm.svg" alt="Arrow left small" class="gray-icon">
+                        <img src="/assets/svgs/arrow-left-ic-sm-red.svg" alt="Arrow left small" class="red-icon">
+                    </button>
+                    <button type="button" class="btn btn-next" (click)="onAddConnectorCombination()">
+                        <img src="/assets/svgs/arrow-right-ic-sm.svg" alt="Arrow right small" class="gray-icon">
+                        <img src="/assets/svgs/arrow-right-ic-sm-red.svg" alt="Arrow right small red" class="red-icon">
+                    </button>
+                </div>
+                <div class="options-wrap">
+                    <span>Combination</span>
+                    <div class="combination-info">
+                        <div class="row no-gutters title-row">
+                            <div class="col-6">
+                                <span>From</span>
+                            </div>
+                            <div class="col-6">
+                                <span>To</span>
+                            </div>
+                        </div>
+                        <div class="info-body">
+                            <section class="scrollable-area">
+                                <section *ngIf="connectorCombinations">
+                                    <div class="row no-gutters" *ngFor="let item of connectorCombinations; let index = index">
+                                        <div class="col-6">
+                                            <div class="form-wrap">
+                                                <div class="check-wrap label-text shape-display-item">
+                                                    <input type="checkbox" [id]="'item_connector_' + index" [name]="'item_connector_' + index" (change)="onConnectorCombinationCheck($event,item,index)">
+                                                    <label [for]="'item_connector_' + index">
+                                                        {{ item.shape_type_name ? item.shape_type_name : item.library_name }}
+                                                    </label>
+                                                    <button class="btn transparent-btn shape-preview-btn mr-2">
+                                                        <img src="/assets/png/image-ic.png" alt="Image icon">
+                                                    </button>
+                                                    <div [innerHTML]="onRenderSafeSVG(item.shape_type_svg)" class="shape-preview-container"></div>
+                                                    <div class="checkbox"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            {{ item.relationship_type_name }}
+                                        </div>
+                                    </div>
+                                </section>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<ng-template #diagramTypeImportLibraryModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="importLibraryModalLabel">Import Library</h5>
+        <button type="button" class="close" (click)="modal.dismiss('dismiss')" aria-label="Close">
+            <span aria-hidden="true">
+                <img src="/assets/svgs/close-ic.svg" alt="Close icon">
+            </span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div [ngClass]="{ 'display-hidden': !libraryFileUploading }">
+            <img src="/assets/img/loader.gif" class="w24">
+        </div>
+        <div class="form-group" [ngClass]="{ 'display-hidden': libraryFileUploading || hasSelectedImportLibrary }">
+            <ngx-file-drop dropZoneLabel="Upload files" (onFileDrop)="dropped($event)" accept=".xml,.drawio" dropZoneClassName="upload-file-container" contentClassName="upload-file-content2">
+                <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+                    <button type="button" class="upload-file-btn" (click)="openFileSelector()">Upload files</button>
+                </ng-template>
+            </ngx-file-drop>
+        </div>
+        <!-- <div class="checkbox-row d-flex">
+            <div class="custom-control custom-checkbox form-group">
+                <input type="checkbox" class="custom-control-input" id="selectLibrary" [checked]="hasSelectedImportLibrary" (change)="onSelectImportLibrary($event)">
+                <label class="custom-control-label" for="selectLibrary">Select library</label>
+            </div>
+        </div> -->
+        <div class="library-wrapper pt-0 pb-0" *ngIf="hasSelectedImportLibrary">
+            <div class="devider"></div>
+            <div class="row no-gutters">
+                <div class="col-12 col-md-auto shapes-category-col">
+                    <ul class="categories pt-2 pb-2">
+                        <li class="category-item" *ngFor="let item of popupLibraries">
+                            <div class="check-wrap label-text">
+                                <input type="checkbox" [id]="'popup_library_' + item.id" [checked]="selectedPopupLibraries.indexOf(item.id) == -1 ? false : true" (change)="onCheckPopupLibrary($event, item.id)">
+                                <label [for]="'popup_library_' + item.id">{{ item.name }}</label>
+                                <div class="checkbox"></div>
+                                <div class="counter">{{ item.shapes.length }}</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-12 col-md-auto shapes-col bg-white pt-2 pb-2">
+                    <ul class="shapes">
+                        <ng-container *ngFor="let item of popupLibraries">
+                            <ng-container *ngIf="selectedPopupLibraries.indexOf(item.id) !== -1">
+                                <li class="shape-item" *ngFor="let shape_type of item.shapes" [innerHTML]="onRenderSafeSVG(shape_type.svg)"></li>
+                            </ng-container>
+                        </ng-container>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer" *ngIf="!libraryFileUploading">
+        <button type="button" (click)="modal.dismiss('dismiss')" class="btn transparent-btn">Cancel</button>
+        <button type="button" class="btn btn-red" (click)="onAddPopupLibraryToUI()">Apply</button>
+    </div>
+</ng-template>
+<div *ngIf="mxEditorIframeCode" style="display:none;">
+    <iframe [src]="mxEditorIframeCode"></iframe>
+</div>
+<!--&lt;!&ndash;        <button type="button" (click)="onDiagramXmlLibraryImport()">Upload File</button>&ndash;&gt;-->
+<!--        <input type="checkbox" name="select_library" id="select_library">-->
+<!--        <label for="select_library">Select Library</label>-->
+<!--        <ul *ngIf="libraryImportedShapes">-->
+<!--            <li *ngFor="let item of libraryImportedShapes">-->
+<!--                <div [innerHTML]="onRenderSafeSVG(item.svg)"></div>-->
+<!--            </li>-->
+<!--        </ul>-->
+<!--    </div>-->
+<!--    <div class="clearfix mb-2"></div>-->
+<!--</ng-template>-->

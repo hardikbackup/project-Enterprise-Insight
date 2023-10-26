@@ -1,0 +1,11 @@
+<ng-container *ngIf="show == 'input'">
+    <input type="text" class="form-control" [value]="isVarious ? 'Various' : displayLabel(label)" readonly="readonly">
+</ng-container>
+<ng-container *ngIf="show == 'text'">
+    <ng-container *ngIf="isVarious">
+        <span class="font-italic">Various</span>
+    </ng-container>
+    <ng-container *ngIf="!isVarious">
+        {{ displayLabel(label) }}
+    </ng-container>
+</ng-container>

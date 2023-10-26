@@ -1,0 +1,58 @@
+<app-master-layout></app-master-layout>
+<div class="content-wrapper types-editor relationship-types-2">
+    <form [formGroup]="form" (ngSubmit)="onGroupSave()">
+        <div class="content-wrapper__data-title">
+            <div class="row data-highlight d-flex align-items-center m-0">
+                <div class="title-holder col-lg-auto col-12 col-sm-6 col-md-12 d-flex align-items-center p-0">
+                    <a class="btn back-btn" routerLink="/administration/user-groups">
+                        <img class="default-icon" src="/assets/svgs/arrow-left-ic.svg" alt="Left arrow">
+                        <img class="hover-icon" src="/assets/svgs/arrow-left-ic-red.svg" alt="Left arrow red">
+                    </a>
+                    <span>
+                        <img class="default-icon" src="/assets/svgs/share-2-ic.svg">
+                        <img class="hover-icon" src="/assets/svgs/share-2-ic-red.svg">
+                    </span>
+                    <h3>Edit Group</h3>
+                </div>
+                <div class="btn-wrapper action-triger-wrap transparent-btn btn__inline d-flex align-items-center col-lg-auto col-12 col-sm-6 col-md-12 mt-3 mt-sm-0 mt-md-4 mt-lg-0 p-0 ml-sm-auto">
+                    <button type="button" class="btn ml-sm-auto ml-md-0 ml-lg-auto transparent-btn" routerLink="/administration/user-groups" *ngIf="!isLoading">
+                        <img src="/assets/svgs/discard-trash-ic.svg" alt="Trash icon" class="icon">
+                        Discard
+                    </button>
+                    <button type="submit" class="btn transparent-btn fill" *ngIf="!isLoading">
+                        <img src="/assets/svgs/save-ic-white.svg" alt="Save icon" class="icon">
+                        Save
+                    </button>
+                    <div *ngIf="isLoading">
+                        <img src="/assets/img/loader.gif" class="w24">
+                        Processing your request
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="type-editor-content tween-col">
+            <div class="row no-gutters">
+                <div class="col-12 col-lg-auto options-col">
+                    <div class="options-wrap">
+                        <div class="header">
+                            <div class="row no-gutters">
+                                <div class="col-auto relationship-type-name">
+                                    <div class="form-group">
+                                        <label for="name">Name</label>
+                                        <input type="text" class="form-control" formControlName="name" id="name">
+                                        <span class="position-absolute red" *ngIf="hasFormSubmitted && !form.controls.name.valid">Required</span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group mt-5" *ngIf="groupId">
+                                        Group Users: {{ totalGroupUsers }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,117 @@
+<div class="wrapper nav-collapsed menu-collapsed">
+    <app-master-layout></app-master-layout>
+    <div class="content-wrapper types-editor">
+        <div class="content-wrapper__data-title">
+            <div class="row data-highlight d-flex align-items-center m-0">
+                <div class="title-holder col-12 d-flex align-items-center p-0">
+                    <button class="btn back-btn">
+                        <img class="default-icon" src="/assets/svgs/home-ic.svg" alt="Home icon">
+                        <img class="hover-icon" src="/assets/svgs/home-ic-red.svg" alt="Home icon red">
+                    </button>
+                    <h3>Welcome to Your Company. Enterprise Insight</h3>
+                </div>
+            </div>
+        </div>
+        <div class="home-page-content content-details">
+            <div class="row space-20">
+                <div class="col-12 col-md-6">
+                    <div class="card border-0 h-100">
+                        <div class="card-header bg-white border-bottom-radius-0 d-flex justify-content-between border-theme-gray">
+                            <div class="d-flex align-items-center">
+                                <figure class="mb-0 title-icon">
+                                    <img src="/assets/svgs/star-ic.svg" alt="Star icon" />
+                                </figure>
+                                <h6 class="text-capitalize title-text ml-2 mb-0">
+                                    Favorite Models
+                                </h6>
+                            </div>
+                            <button *ngIf="showAllFavoriteModels" (click)="loadFavoriteModels(true)" class="btn transparent-btn btn-small">All</button>
+                        </div>
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush border-0 py-3">
+                                <div *ngIf="isLoadingFavoriteModels" class="text-center">
+                                    <img src="/assets/img/loader.gif" class="w24 vertical-align-middle mr-1">
+                                </div>
+                                <div *ngIf="!isLoadingFavoriteModels" class="scrollable-contents" style="max-height: 693px;">
+                                    <li class="list-group-item" *ngFor="let item of favoriteModels">
+                                        <span (click)="onOpenModel(item.id)" class="d-flex align-items-center">
+                                            <div class="icon">
+                                                <img src="/assets/svgs/model-box-ic.svg" alt="Model box icon" class="default-icon">
+                                                <img src="/assets/svgs/model-box-ic-red.svg" alt="Model box icon" class="active-icon">
+                                            </div>
+                                            <span class="ml-2 text-capitalize">{{ item.name }}</span>
+                                        </span>
+                                    </li>
+                                </div>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="card border-0 h-100">
+                        <div class="card-header bg-white border-bottom-radius-0 d-flex justify-content-between border-theme-gray">
+                            <div class="d-flex align-items-center">
+                                <h6 class="text-capitalize title-text ml-2 mb-0">
+                                    Popular content
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <span class="group-title text-capitalize border-top-0 px-3 py-2 w-100 d-flex justify-content-center">Popular diagrams</span>
+                            <ul class="list-group list-group-flush border-0 py-3">
+                                <div *ngIf="isLoadingPopularDiagrams" class="text-center">
+                                    <img src="/assets/img/loader.gif" class="w24 vertical-align-middle mr-1">
+                                </div>
+                                <div class="scrollable-contents" *ngIf="!isLoadingPopularDiagrams">
+                                    <li class="list-group-item" *ngFor="let item of popularDiagrams">
+                                        <a (click)="onOpenDiagram(item); $event.stopPropagation()" class="d-flex align-items-center">
+                                            <div class="icon">
+                                                <img src="/assets/svgs/diagram-icon-small.svg" alt="Diagram icon" class="default-icon">
+                                                <img src="/assets/svgs/diagram-icon-small.svg" alt="Diagram icon" class="active-icon">
+                                            </div>
+                                            <span class="ml-2 text-capitalize">{{ item.name }}</span>
+                                        </a>
+                                    </li>
+                                </div>
+                            </ul>
+                            <span class="group-title text-capitalize px-3 py-2 w-100 d-flex justify-content-center">Popular Queries</span>
+                            <ul class="list-group list-group-flush border-0 py-3">
+                                <div *ngIf="isLoadingPopularQueries" class="text-center">
+                                    <img src="/assets/img/loader.gif" class="w24 vertical-align-middle mr-1">
+                                </div>
+                                <div class="scrollable-contents" *ngIf="!isLoadingPopularQueries">
+                                    <li class="list-group-item" *ngFor="let item of popularQueries">
+                                        <a [routerLink]="'/queries/' + item.id + '/edit'" class="d-flex align-items-center">
+                                            <div class="icon">
+                                                <img src="/assets/svgs/alert-circle-ic.svg" alt="Diagram icon" class="default-icon">
+                                                <img src="/assets/svgs/alert-circle-ic-red.svg" alt="Diagram icon red" class="active-icon">
+                                            </div>
+                                            <span class="ml-2 text-capitalize">{{ item.name }}</span>
+                                        </a>
+                                    </li>
+                                </div>
+                            </ul>
+                            <span class="group-title text-capitalize px-3 py-2 w-100 d-flex justify-content-center">Popular Models</span>
+                            <ul class="list-group list-group-flush border-0 py-3">
+                                <div *ngIf="isLoadingPopularModels" class="text-center">
+                                    <img src="/assets/img/loader.gif" class="w24 vertical-align-middle mr-1">
+                                </div>
+                                <div class="scrollable-contents" *ngIf="!isLoadingPopularModels">
+                                    <li class="list-group-item" *ngFor="let item of popularModels">
+                                        <a (click)="onOpenModel(item.id)" class="d-flex align-items-center">
+                                            <div class="icon">
+                                                <img src="/assets/svgs/model-box-ic.svg" alt="Model box icon" class="default-icon">
+                                                <img src="/assets/svgs/model-box-ic-red.svg" alt="Model box icon" class="active-icon">
+                                            </div>
+                                            <span class="ml-2 text-capitalize">{{ item.name }}</span>
+                                        </a>
+                                    </li>
+                                </div>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

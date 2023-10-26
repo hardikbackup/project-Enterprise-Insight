@@ -1,0 +1,67 @@
+<ul>
+    <li class="dropdown-item" [ngClass]="{'expanded': item.expand}" *ngFor="let item of items">
+        <div class="content" *ngIf="show == 'object-relationships'">
+            <button class="btn icon arrow-icon" (click)="loadObjects(item, 1)" *ngIf="!item.expand">
+                <img src="/assets/svgs/object-box-dropdown-arrow-right.svg" alt="Arrow right" class="gray-icon">
+                <img src="/assets/svgs/object-box-dropdown-arrow-right-red.svg" alt="Arrow right red" class="red-icon">
+            </button>
+            <button class="btn icon arrow-icon" (click)="collapseObjects(item)" *ngIf="item.expand">
+                <img src="/assets/svgs/object-box-dropdown-arrow-expanded.svg" alt="Arrow right" class="gray-icon">
+                <img src="/assets/svgs/object-box-dropdown-arrow-expanded-red.svg" alt="Arrow right red" class="red-icon">
+            </button>
+            <ng-container *ngIf="item.relationship_type_id == 'navigates_to'">
+                <span>Navigates To ({{ item.total_diagrams ? item.total_diagrams : 0 }})</span>
+            </ng-container>
+            <ng-container *ngIf="item.relationship_type_id && item.relationship_type_id != 'navigates_to'">
+                <span>{{ item.name }} ({{ item.total_objects ? item.total_objects : 0 }})</span>
+            </ng-container>
+            <ng-container *ngIf="!item.relationship_type_id">
+                <span>Navigates From ({{ item.total_objects ? item.total_objects : 0 }})</span>
+            </ng-container>
+        </div>
+        <div class="content" *ngIf="show == 'objects'">
+            <button class="btn icon arrow-icon" (click)="loadObjectRelationships(item, false, 1)" *ngIf="!item.expand && !item.diagram_id">
+                <img src="/assets/svgs/object-box-dropdown-arrow-right.svg" alt="Arrow right" class="gray-icon">
+                <img src="/assets/svgs/object-box-dropdown-arrow-right-red.svg" alt="Arrow right red" class="red-icon">
+            </button>
+            <button class="btn icon arrow-icon" (click)="collapseObjects(item)" *ngIf="item.expand">
+                <img src="/assets/svgs/object-box-dropdown-arrow-expanded.svg" alt="Arrow right" class="gray-icon">
+                <img src="/assets/svgs/object-box-dropdown-arrow-expanded-red.svg" alt="Arrow right red" class="red-icon">
+            </button>
+            <div class="object-box">
+                <div class="icon">
+                    <ng-container *ngIf="!item.model_id">
+                        <img src="/assets/svgs/cube-layers-ic.svg" alt="Layer icon" class="gray-icon">
+                        <img src="/assets/svgs/cube-layers-ic-red.svg" alt="Layer icon red" class="red-icon">
+                    </ng-container>
+                    <ng-container *ngIf="item.model_id">
+                        <img src="/assets/svgs/diagram-icon-small.svg" alt="Layer icon" class="gray-icon">
+                        <img src="/assets/svgs/diagram-icon-small-red.svg" alt="Layer icon red" class="red-icon">
+                    </ng-container>
+                </div>
+                <span>{{ item.name }}</span>
+            </div>
+        </div>
+        <app-object-relationship-tree
+            *ngIf="item.expand && item.items && item.items.length"
+            [items]="item.items"
+            [id]="item.id"
+            [relationship_id]="item.id"
+            [show]="getNestedShowType()"
+            [load]="false"
+            [login_key]="login_key"
+            [parent_item]="item"
+            [pages]="item.pages"
+            [parentRelationshipID]="relationship_id"
+            [parentRelationshipTypeID]="item.relationship_type_id"
+            class="object-box-dropdown sub-dropdown">
+        </app-object-relationship-tree>
+    </li>
+    <ng-container *ngIf="pages > 1 && currentPage < pages">
+        <li class="dropdown-item mt-2">
+            <a class="btn transparent-btn small" (click)="loadMoreItems()">
+                <dfn class="d-none d-md-inline-block">Load More</dfn>
+            </a>
+        </li>
+    </ng-container>
+</ul>

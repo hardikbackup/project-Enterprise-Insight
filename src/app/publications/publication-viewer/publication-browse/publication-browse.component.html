@@ -1,0 +1,143 @@
+<app-header [stand_alone_header]="true" [show_environment]="false"></app-header>
+<div class="content-wrapper types-editor ml-0">
+    <div class="content-wrapper__data-title">
+        <div class="row data-highlight d-flex align-items-center m-0">
+            <div class="title-holder col-lg-auto col-12 d-flex align-items-center p-0">
+                <button class="btn back-btn cursor-pointer" (click)="navigationPublications()">
+                    <img class="default-icon" src="/assets/svgs/file-text-ic.svg" alt="File text icon">
+                    <img class="hover-icon" src="/assets/svgs/file-text-ic-red.svg" alt="File text icon red">
+                </button>
+                <h3>Publications</h3>
+            </div>
+        </div>
+        <div class="row m-0 data-trigger d-flex align-items-center">
+            <div class="col-md-10 col-sm-12 px-0 breadcrumb-info d-none d-md-block">
+                <div class="breadcrumbs">
+                    <a (click)="navigationPublications()" class="cursor-pointer text-decoration-none">Publications</a>
+                    <ng-container *ngIf="publication.name">
+                        <a>{{ publication.name }}</a>
+                    </ng-container>
+                    <ng-container *ngIf="type == 'view'">
+                        <a>visualization</a>
+                        <a *ngIf="viewName">{{ viewName }}</a>
+                    </ng-container>
+                </div>
+            </div>
+            <div class="col-2" *ngIf="showEmbeddPublications">
+                <button
+                  class="btn btn-primary"
+                  type="button"
+                  placement="bottom"
+                  ngbPopover="Click on a button"
+                  triggers="click"
+                  [ngbPopover]="popContent"
+                  style="padding-left: 20px;
+                  padding-right: 20px;
+                  color:white"
+                >
+                Embed
+                </button>
+                <ng-template #popContent>
+                  <div class="mt-1">
+                    <a class="btn transparent-btn small" (click)="openConfluenceModel()">
+                      <dfn class="d-none d-md-inline-block mt-w"
+                      >Confluence</dfn>
+                    </a>
+                  </div>
+                  <div class="mt-1">
+                    <a class="btn transparent-btn small" (click)="openSharepointModel()">
+                      <dfn class="d-none d-md-inline-block mt-1">Sharepoint</dfn>
+                    </a>
+                  </div>
+                  <div class="mt-1">
+                 <a class="btn transparent-btn small" (click)="openUrlModel()">
+                      <dfn class="d-none d-md-inline-block mt-1">URL</dfn>
+                     </a>
+                  </div>
+                </ng-template>
+              </div>
+        </div>
+    </div>
+    <ng-container *ngIf="type == 'diagram'">
+        <ng-container *ngIf="publication.diagram_id">
+            <app-diagram-viewer [diagramId]="publication.diagram_id"
+                [diagramSVG]="publication.diagram_svg"
+                [isShowSidebar]="true"
+                [isDiagramZoom]="true"
+                ></app-diagram-viewer>
+        </ng-container>
+    </ng-container>
+    <section *ngIf="isLoading">
+        <img src="/assets/img/loader.gif">
+        Loading...
+    </section>
+    <ng-container *ngIf="type == 'view' && viewLoaded && viewType == 'box'">
+        <!-- <app-box-view [ngStyle]="{'display': 'block'}" [viewGeneratorData]="viewGeneratorData"
+            [viewGeneratorGroups]="viewGeneratorGroups" [groupOptions]="viewGeneratorSelectedGroupOptions"
+            [readOnly]="true" [publication]="true"
+            [viewGeneratorSelectedLayout]="viewGeneratorSelectedLayout"></app-box-view> -->
+    </ng-container>
+    <ng-container *ngIf="type == 'view' && viewLoaded && viewType == 'hierarchy'">
+        <div class="view-tree-component">
+            <div class="inner-container">
+        <div class="row" class="masonry-with-columns">
+        <ng-container *ngFor="let item of viewGeneratorData | keyvalue">
+            <app-hierarchy-view class="app-h-v large-col" [item]="item.value"
+                [level]="0" [parentId]="0"></app-hierarchy-view>
+        </ng-container>
+        </div>
+        </div>
+        </div>
+    </ng-container>
+<!-- Confluence modal -->
+<ng-template #confluenceModel let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title text-center">Embed Code</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('dismiss')">
+            <span aria-hidden="true">
+                <img src="/assets/svgs/modal-x-ic.svg" alt="X icon">
+            </span>
+        </button>
+    </div>
+    <div class="modal-body" id="contentToCopy" style="margin-bottom:30px;width: 100% !important;word-wrap: break-word;">
+        <p>{{publicationEmbeddHtml}}</p>
+    </div>
+   
+</ng-template>
+<!-- sharepointModel -->
+<ng-template #sharepointModel let-modal>
+        <div class="modal-header">
+            <h4 class="modal-title text-center">
+                Embed Code
+            </h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                (click)="modal.dismiss('dismiss')">
+                <span aria-hidden="true">
+                    <img src="/assets/svgs/modal-x-ic.svg" alt="X icon">
+                </span>
+            </button>
+        </div>
+        <div class="modal-body" style="margin-bottom:30px;width: 100% !important;word-wrap: break-word;">
+            <p>{{publicationEmbeddHtml}}</p>
+        </div>
+   
+</ng-template>
+<!-- url -->
+<ng-template #urlModel let-modal>
+        <div class="modal-header">
+            <h4 class="modal-title text-center">
+               Embed URL
+            </h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                (click)="modal.dismiss('dismiss')">
+                <span aria-hidden="true">
+                    <img src="/assets/svgs/modal-x-ic.svg" alt="X icon">
+                </span>
+            </button>
+        </div>
+        <div class="modal-body" style="margin-bottom:30px;width: 100% !important;word-wrap: break-word;">
+          <p>{{publicationEmbeddUrl}}</p>  
+        
+        </div>
+    </ng-template>
+</div>

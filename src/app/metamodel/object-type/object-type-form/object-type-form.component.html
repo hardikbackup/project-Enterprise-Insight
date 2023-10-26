@@ -1,0 +1,264 @@
+<app-master-layout></app-master-layout>
+<div class="content-wrapper types-editor">
+    <div class="content-wrapper__data-title">
+        <div class="row data-highlight d-flex align-items-center m-0">
+            <div class="title-holder col-lg-auto col-12 d-flex align-items-center p-0">
+                <button class="btn back-btn" routerLink="/metamodel/object-type">
+                    <img class="default-icon" src="/assets/svgs/arrow-left-ic.svg" alt="Left arrow">
+                    <img class="hover-icon" src="/assets/svgs/arrow-left-ic-red.svg" alt="Left arrow red">
+                </button>
+                <h3>Object Type Editor</h3>
+            </div>
+            <div class="btn-wrapper action-triger-wrap transparent-btn btn__inline d-flex align-items-center col-lg-auto col-12 col-sm-6 col-md-12 mt-3 mt-sm-0 mt-md-4 mt-lg-0 p-0 ml-sm-auto">
+                <button type="button" class="btn ml-sm-auto ml-md-0 ml-lg-auto transparent-btn" routerLink="/metamodel/object-type" *ngIf="!isLoading">
+                    <img src="/assets/svgs/discard-trash-ic.svg" alt="Trash icon" class="icon">
+                    Discard
+                </button>
+                <button type="button" (click)="onObjectTypeUpdate()" class="btn transparent-btn fill" *ngIf="!isLoading">
+                    <img src="/assets/svgs/save-ic-white.svg" alt="Save icon" class="icon">
+                    Save
+                </button>
+                <div *ngIf="isLoading">
+                    <img src="/assets/img/loader.gif" class="w24">
+                    Processing your request
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="type-editor-content tween-col">
+        <div class="row">
+            <div class="col-12">
+                <div class="item-nav">
+                    <a [ngClass]="{'active': currentActiveTab == 'general'}" (click)="onTabChange('general')" class="cursor-pointer">General</a>
+                    <a [ngClass]="{'active': currentActiveTab == 'attributes'}" (click)="onTabChange('attributes')" class="cursor-pointer">Attributes</a>
+                </div>
+            </div>
+        </div>
+        <div class="row no-gutters">
+            <div class="col-12 col-md-auto options-col w-100">
+                <form [formGroup]="form" (ngSubmit)="onObjectTypeUpdate()" *ngIf="firstLoad">
+                    <section [ngClass]="{'display-hidden': currentActiveTab == 'attributes'}">
+                        <div class="options-wrap mb-3">
+                            <div class="header">
+                                <div class="row no-gutters">
+                                    <div class="col-12 type-name">
+                                        <div class="form-group">
+                                            <label for="name">Object Type Name</label>
+                                            <input type="text" class="form-control" formControlName="name" id="name">
+                                            <span class="position-absolute red" *ngIf="hasFormSubmitted && !form.controls.name.valid">Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="style-details bg-white">
+                            <div class="heading-row row">
+                                <div class="col-12 col-xl-6">
+                                    <div class="row no-gutters">
+                                        <div class="col-12 col-sm-6 col-md-4">
+                                            <div class="form-group shape-color body-bg" [ngClass]="{'active': shapeColorActiveTab == 'shape_color'}">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <span class="label">Color of shape type</span>
+                                                        <label type="text" class="d-block w-100 color-picker-label"
+                                                               [(colorPicker)]="shapeTypeColor"
+                                                               [cpOutputFormat]="'hex'"
+                                                               [cpPosition]="'bottom'"
+                                                               [cpExtraTemplate]="shapeTypeTemplate"
+                                                               [(cpToggle)]="showShapeColorPicker"
+                                                               (cpToggleChange)="onColorPickerChange('shape_type',$event)"
+                                                               [cpPresetColors]="presetColors"
+                                                        >
+                                                            {{ shapeTypeColor }}
+                                                        </label>
+                                                    </div>
+                                                    <span class="color-controller" [style.background]="shapeTypeColor" (click)="onShowColorPicker('shape_type')"></span>
+                                                </div>
+                                            </div>
+                                            <ng-template #shapeTypeTemplate>
+                                                <ul class="list-inline text-center mb-2">
+                                                    <li class="list-inline-item">
+                                                        <button type="button" (click)="onCloseColorPicker('shape_type', true)" class="btn ml-sm-auto ml-md-0 ml-lg-auto transparent-btn sm-btn" tabindex="0">
+                                                            <img src="/assets/svgs/discard-trash-ic.svg" alt="Trash icon" class="icon">
+                                                            &nbsp;Discard
+                                                        </button>
+                                                    </li>
+                                                    <li class="list-inline-item">
+                                                        <button type="button" (click)="onSaveColor('shape_type')" class="btn transparent-btn fill sm-btn">
+                                                            <img src="/assets/svgs/save-ic-white.svg" alt="Save icon" class="icon">
+                                                            &nbsp;Save
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </ng-template>
+                                        </div>
+                                        <div class="col-12 mt-2 mt-sm-0 col-sm-6 col-md-4">
+                                            <div class="form-group shape-color body-bg" [ngClass]="{'active': shapeColorActiveTab == 'shape_type_text_color'}">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <span class="label">Text Color of shape type</span>
+                                                        <label class="d-block w-100 color-picker-label"
+                                                               [(colorPicker)]="shapeTypeTextColor"
+                                                               [cpOutputFormat]="'hex'"
+                                                               [cpPosition]="'bottom'"
+                                                               [cpExtraTemplate]="shapeTypeTextTemplate"
+                                                               [(cpToggle)]="showShapeTextColorPicker"
+                                                               (cpToggleChange)="onColorPickerChange('shape_type_text',$event)"
+                                                               [cpPresetColors]="presetColors"
+                                                        >{{ shapeTypeTextColor }}</label>
+                                                    </div>
+                                                    <span class="color-controller" [style.background]="shapeTypeTextColor" (click)="onShowColorPicker('shape_type_text')"></span>
+                                                </div>
+                                            </div>
+                                            <ng-template #shapeTypeTextTemplate>
+                                                <ul class="list-inline text-center mb-2">
+                                                    <li class="list-inline-item">
+                                                        <button type="button" (click)="onCloseColorPicker('shape_type_text', true)" class="btn ml-sm-auto ml-md-0 ml-lg-auto transparent-btn sm-btn" tabindex="0">
+                                                            <img src="/assets/svgs/discard-trash-ic.svg" alt="Trash icon" class="icon">
+                                                            &nbsp;Discard
+                                                        </button>
+                                                    </li>
+                                                    <li class="list-inline-item">
+                                                        <button type="button" (click)="onSaveColor('shape_type_text')" class="btn transparent-btn fill sm-btn">
+                                                            <img src="/assets/svgs/save-ic-white.svg" alt="Save icon" class="icon">
+                                                            &nbsp;Save
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </ng-template>
+                                        </div>
+                                        <div class="col-12 mt-2 mt-md-0 col-sm-6 col-md-4">
+                                            <div class="form-group shape-color body-bg" [ngClass]="{'active': shapeColorActiveTab == 'shape_type_border_color'}">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <span class="label">Border Color of shape type</span>
+                                                        <label class="d-block w-100 color-picker-label"
+                                                               [(colorPicker)]="shapeTypeBorderColor"
+                                                               [cpOutputFormat]="'hex'"
+                                                               [cpPosition]="'bottom'"
+                                                               [cpExtraTemplate]="shapeTypeBorderTemplate"
+                                                               [(cpToggle)]="showShapeBorderPicker"
+                                                               (cpToggleChange)="onColorPickerChange('shape_type_border',$event)"
+                                                               [cpPresetColors]="presetColors"
+                                                        >
+                                                            {{ shapeTypeBorderColor }}
+                                                        </label>
+                                                    </div>
+                                                    <span class="color-controller" [style.background]="shapeTypeBorderColor" (click)="onShowColorPicker('shape_type_border')"></span>
+                                                </div>
+                                            </div>
+                                            <ng-template #shapeTypeBorderTemplate>
+                                                <ul class="list-inline text-center mb-2">
+                                                    <li class="list-inline-item">
+                                                        <button type="button" (click)="onCloseColorPicker('shape_type_border', true)" class="btn ml-sm-auto ml-md-0 ml-lg-auto transparent-btn sm-btn" tabindex="0">
+                                                            <img src="/assets/svgs/discard-trash-ic.svg" alt="Trash icon" class="icon">
+                                                            &nbsp;Discard
+                                                        </button>
+                                                    </li>
+                                                    <li class="list-inline-item">
+                                                        <button type="button" (click)="onSaveColor('shape_type_border')" class="btn transparent-btn fill sm-btn">
+                                                            <img src="/assets/svgs/save-ic-white.svg" alt="Save icon" class="icon">
+                                                            &nbsp;Save
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </ng-template>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-2 mt-xl-0 col-xl-6 d-flex align-items-center search-shape-container">
+                                    <div class="dropdown col pl-0">
+                                        <div class="search-row body-bg d-flex">
+                                            <button class="btn btn-search">
+                                                <img *ngIf="selectedShapeTypeImage == null" src="/assets/svgs/icon-search-ic.svg" alt="Search icon">
+                                                <img [src]="selectedShapeTypeImage" *ngIf="selectedShapeTypeImage != null">
+                                            </button>
+                                            <div class="form-group">
+                                                <input id="shape_keyword_search" type="text" class="form-control" [value]="selectedShapeTypeName" placeholder="Search" (click)="onShowShapeIcons()" (keyup)="onShapeIconSearch($event)" #shapeKeywordSearchEl>
+                                                <label for="shape_keyword_search">Icon of shape type</label>
+                                            </div>
+                                            <button type="button" class="btn btn-toggler" (click)="onToggleSearchResults()">
+                                                <img src="/assets/svgs/arrow-down.svg" alt="Down arrow" class="icon">
+                                            </button>
+                                        </div>
+                                        <div class="shape body-bg dropdown-menu bg-white w-100" [ngClass]="{'d-block': showSearchShapeResults}">
+                                            <ul class="shape-list">
+                                                <li *ngFor="let item of availableShapeTypes; let index = index" (click)="onSelectShapeIcon(item)" class="shape-list--item" [ngClass]="{'active': checkShapeImageSelected(item), 'display-hidden': item.hide}">
+                                                    <figure class="shape-ic">
+                                                        <img [src]="item.image" >
+                                                    </figure>
+                                                    <span class="shape-label">{{ item.name }}</span>
+                                                    <img src="/assets/svgs/discard-trash-ic.svg" class="icon ml-2"  (click)="onDeleteShapeTypeImage(item, index); $event.stopPropagation()">
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-2 mt-lg-0 px-0">
+                                        <button type="button" class="btn transparent-btn" (click)="onSelectShapeImages()"> Import Shapes </button>
+                                        <input type="file" accept=".png" multiple="multiple" [ngStyle]="{ display: 'none' }" (change)="onShapeImportProcess($event)" #shapeImportFileEl>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group mt-2 px-0">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" formControlName="is_round_corners" id="is_round_corners" class="custom-control-input ng-untouched ng-pristine ng-valid">
+                                            <label for="is_round_corners" class="custom-control-label"></label>
+                                            <span class="ml-2 position-relative top-6 round-corner-label">Round Corners</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <div style="display: flex;">
+                    <section class="options-wrap col-6" style="min-height: 33rem;" [ngClass]="{'display-hidden': currentActiveTab == 'general'}">
+                        <!-- <div class="header">
+                      
+                        </div> -->
+                        <div >
+                           
+                            <div class="col-12">
+                                <div class="form-group input-field mt-4">
+                                    <label for="add_list_option">Tab Name</label>
+                                    <input type="text" id="add_list_option" class="form-control list-option" (keydown.enter)="onAddTab(); $event.preventDefault()" #tabNameEl>
+                                    <a class="submit-option submit-option-btn text-center cursor-pointer" (click)="onAddTab()">
+                                        <img src="/assets/svgs/Union.svg" alt="Arrow right gray" class="icon-gray">
+                                    </a>
+                                </div>
+                                <h5>List Tabs</h5>
+                                <ul class="list-unstyled" *ngIf="attributeTabs.length">
+                                    <li *ngFor="let item of attributeTabs; let index = index">
+                                        <div class="form-wrap mb-3">
+                                            <div class="check-wrap radio-item label-text">
+                                                <input type="checkbox" [id]="'tab_' + index" [checked]="selectedAttributeTabIndex == index" (change)="onAttributeTabChange($event, index)">
+                                                <label [for]="'tab_' + index">
+                                                    <p class="lead-text text-transform-initial">
+                                                        {{ item.name }}
+                                                        <a class="float-right" (click)="onRemoveTab(index)">
+                                                            <img src="/assets/svgs/close-icon-gray.svg" class="w18" alt="Close icon">
+                                                        </a>
+                                                    </p>
+                                                </label>
+                                                <div class="checkbox"></div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <span *ngIf="!attributeTabs.length">No tabs available</span>
+                            </div>
+                            <!-- <app-dual-list-box *ngIf="selectedAttributeTabIndex != -1" [available_label]="'Attributes Available'" [selected_label]="'Attributes Assigned'" [available_types]="availableAttributeTypes" [selected_types]="preSelectedAttributeTypes" [leftScrollbarClass]="'object-type-scrollable'" [rightScrollbarClass]="'object-type-scrollable'" (exportSelectedTypes)="exportSelectedTypes($event)"></app-dual-list-box> -->
+                        </div>
+                    </section>
+                    <section class="options-wrap" style="min-height: 33rem;" [ngClass]="{'display-hidden': currentActiveTab == 'general'}">
+                        <div class="body" style="min-height: 33rem;">
+                        
+                            <app-dual-list-box *ngIf="selectedAttributeTabIndex != -1" [available_label]="'Attributes Available'" [selected_label]="'Attributes Assigned'" [available_types]="availableAttributeTypes" [selected_types]="preSelectedAttributeTypes" [leftScrollbarClass]="'object-type-scrollable'" [rightScrollbarClass]="'object-type-scrollable'" (exportSelectedTypes)="exportSelectedTypes($event)"></app-dual-list-box>
+                        </div>
+                    </section>
+                </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,57 @@
+<div class="wrapper nav-collapsed menu-collapsed">
+    <section id="login">
+        <div class="container-fluid">
+            <div class="row full-height-vh">
+                <div class="col-12 d-flex align-items-center justify-content-center gradient-blue-grey-blue-grey">
+                    <div class="card px-4 py-2 box-shadow-2 width-400 auth-container">
+                        <div class="text-center">
+                            <img src="/assets/img/logo.png" alt="company-logo" width="100">
+                        </div>
+                        <div class="card-body">
+                            <div class="card-block">
+                                <form [formGroup]="form" (ngSubmit)="onRegister()">
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <input type="username" class="form-control form-control-lg" formControlName="username" placeholder="Username">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <input type="email" class="form-control form-control-lg" formControlName="email" placeholder="Email Address">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <input type="password" class="form-control form-control-lg" formControlName="password" placeholder="Password">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <input type="password" class="form-control form-control-lg" formControlName="repeat_password" placeholder="Repeat Password">
+                                        </div>
+                                    </div>
+                                    <div class="form-group mb-1">
+                                        <div class="text-center col-md-12">
+                                            <div *ngIf="isLoading">
+                                                <img src="/assets/img/loader.gif" class="w24">
+                                                Processing your request
+                                            </div>
+                                            <button type="submit" class="btn btn-red w-100" *ngIf="!isLoading">Register</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="grey darken-1">
+                            <div class="text-center mb-1">
+                                <a routerLink="/auth/login" class="dark-gray">
+                                    <b>Login</b>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

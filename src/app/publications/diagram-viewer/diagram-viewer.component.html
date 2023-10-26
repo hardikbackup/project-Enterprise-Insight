@@ -1,0 +1,455 @@
+<app-header *ngIf="standAlonePage" [stand_alone_header]="true" [show_environment]="false"></app-header>
+<div [ngClass]="{'content-wrapper types-editor ml-0': standAlonePage}">
+    <div class="content-wrapper__data-title" *ngIf="standAlonePage">
+        <div class="row data-highlight d-flex align-items-center m-0">
+            <div class="title-holder col-lg-auto col-12 d-flex align-items-center p-0">
+                <button class="btn back-btn" (click)="navigationPublications()">
+                    <img class="default-icon" src="/assets/svgs/file-text-ic.svg" alt="File text icon">
+                    <img class="hover-icon" src="/assets/svgs/file-text-ic-red.svg" alt="File text icon red">
+                </button>
+                <h3>Publications</h3>
+            </div>
+        </div>
+        <div class="row m-0 data-trigger d-flex align-items-center">
+            <div class="col-md-8 col-sm-12 px-0 breadcrumb-info d-none d-md-block">
+                <div class="breadcrumbs">
+                    <a routerLink="/publications/viewer" class="text-decoration-none">Publications</a>
+                    <a>Diagram Viewer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="content-viewer diagram-view-body diagram-svg-viewer pl-4 w-100"
+            style="height: calc(100vh - 151px); max-height: calc(100vh - 151px);">
+            <section *ngIf="isLoading">
+                <img src="/assets/img/loader.gif">
+                Loading Diagram SVG
+            </section>
+            <section *ngIf="!isLoading" class="w-100">
+                <div class="legend-bar" *ngIf="showColorMapLabels()" >
+                    <h5 class="text-dark">
+                        {{ selectedAttribute.type == 'color' ? 'Color' : 'Heatmap' }}: {{
+                        selectedAttribute.attribute.name }}
+                        <a class="cursor-pointer" (click)="onResetColors()">
+                            <img src="/assets/svgs/close-x-ic.svg" class="w20">
+                        </a>
+                    </h5>
+                    <ul class="list-unstyled">
+                        <li *ngFor="let item of selectedAttribute.values; let index = index;"
+                            class="list-inline-item mr-5">
+                            <div class="diagram-color-label"
+                                [ngStyle]="{ 'background-color': selectedAttribute.colors[index] }"></div>
+                            {{ renderPropertiesValue(item, true) }}
+                        </li>
+                    </ul>
+                </div>
+                <div class="diagram-svg-container" *ngIf="hasDiagramSVG()" #diagramSvgContainerEl>
+                    <section id="diagram_svg_container" class="svg-wrap" [innerHTML]="selectedDiagramSafeSVG"
+                        style="display:none1;padding-left:{{ selectedDiagramSVGPaddingLeft }}px;padding-top:{{ selectedDiagramSVGPaddingTop }}px;">
+                    </section>
+                    <div class="controller-buttons" *ngIf="isDiagramZoom">
+                        <button class="btn zoomIn" (click)="onDiagramSVGZoom('in')">+</button>
+                        <button class="btn resetZoom ml-0" (click)="onDiagramSVGZoom('reset')">Reset</button>
+                        <button class="btn zoomOut" (click)="onDiagramSVGZoom('out')">-</button>
+                    </div>
+                </div>
+                <div class="alert alert-secondary mt-2" *ngIf="!hasDiagramSVG()">
+                    No SVG Preview is available, please draw new shapes inside Diagram first
+                </div>
+                <div class="diagram-info-sidebar z-full border-top-red" *ngIf="mxEditorObjectShapeDetails && !isPublicAccess">
+                    <div class="title-wrap d-flex">
+                        <h5 [ngSwitch]="mxEditorObjectShapeDetails.type">
+                            <ng-container *ngSwitchCase="'object'">
+                                {{ mxEditorObjectShapeDetails.object_type_attributes[0].name }}
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'relationship'">
+                                Relationship Details
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'relationship_type'">
+                                Relationship Type Details
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'object_type'">
+                                Object Type Details
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'not_found'">
+                                Unknown
+                            </ng-container>
+                        </h5>
+                        <button type="button" class="btn btn-close ml-auto" (click)="onCloseObjectShapeDetails()">
+                            <img src="/assets/svgs/close-x-ic.svg" alt="Close icon">
+                        </button>
+                    </div>
+                    <div class="info-body"
+                        [ngClass]="{ 'p-1' : mxEditorObjectShapeDetails.type == 'object' || mxEditorObjectShapeDetails.type == 'relationship' }">
+                        <ng-container [ngSwitch]="mxEditorObjectShapeDetails.type">
+                            <section *ngSwitchCase="'object'">
+                                <div class="card select-card">
+                                    <div class="card-header d-flex justify-content-between cursor-pointer"
+                                        (click)="onToggleGeneralTab()">
+                                        <span>General</span>
+                                        <img src="/assets/svgs/chevron-down.svg" class="gray-icon arrow-icon"
+                                            [ngClass]="{ 'transform-180': generalTabExpanded }">
+                                    </div>
+                                    <div class="card-body" [ngClass]="{ 'd-none': !generalTabExpanded }">
+                                        <ul class="info-lists">
+                                            <li class="list-item">
+                                                <div class="info">
+                                                    <span class="label">
+                                                        Model Name
+                                                    </span>
+                                                    <h5>{{
+                                                        mxEditorObjectShapeDetails.object_type_attributes[0].model_name
+                                                        }}</h5>
+                                                </div>
+                                            </li>
+                                            <li class="list-item">
+                                                <div class="info">
+                                                    <span class="label">
+                                                        Object Type
+                                                    </span>
+                                                    <h5>{{
+                                                        mxEditorObjectShapeDetails.object_type_attributes[0].object_type
+                                                        }}</h5>
+                                                </div>
+                                            </li>
+                                            <li class="list-item">
+                                                <div class="info">
+                                                    <span class="label">
+                                                        Created On
+                                                    </span>
+                                                    <h5>{{
+                                                        displayDateTimeFormat(mxEditorObjectShapeDetails.object_type_attributes[0].created_date)
+                                                        }}</h5>
+                                                </div>
+                                            </li>
+                                            <li class="list-item">
+                                                <div class="info">
+                                                    <span class="label">
+                                                        Last Updated
+                                                    </span>
+                                                    <h5>{{
+                                                        displayDateTimeFormat(mxEditorObjectShapeDetails.object_type_attributes[0].updated_date)
+                                                        }}</h5>
+                                                </div>
+                                            </li>
+                                            <li class="list-item">
+                                                <div class="info">
+                                                    <span class="label">
+                                                        Created By
+                                                    </span>
+                                                    <h5>{{
+                                                        mxEditorObjectShapeDetails.object_type_attributes[0].created_by
+                                                        ?
+                                                        mxEditorObjectShapeDetails.object_type_attributes[0].created_by
+                                                        : '-' }}</h5>
+                                                </div>
+                                            </li>
+                                            <li class="list-item">
+                                                <div class="info">
+                                                    <span class="label">
+                                                        Updated By
+                                                    </span>
+                                                    <h5>{{
+                                                        mxEditorObjectShapeDetails.object_type_attributes[0].updated_by
+                                                        ?
+                                                        mxEditorObjectShapeDetails.object_type_attributes[0].updated_by
+                                                        : '-' }}</h5>
+                                                </div>
+                                            </li>
+                                            <ng-container
+                                                *ngFor="let tab of mxEditorObjectShapeDetails.object_type_attributes[0].tabs">
+                                                <ng-container *ngIf="tab.name == 'General'">
+                                                    <li class="list-item"
+                                                        *ngFor="let ai of filterTabAttributes(tab.attribute_ids, mxEditorObjectShapeDetails.object_type_attributes[0].attributes); last as isLast">
+                                                        <div class="info">
+                                                            <span class="label">
+                                                                {{ ai.name }}
+                                                            </span>
+                                                            <h5>{{ renderPropertiesValue(ai,true) }}</h5>
+                                                        </div>
+                                                        <div class="float-right color-options"
+                                                            [ngClass]="{ 'options-shown': showAttributeColorId == ai.attribute_id, 'last-attribute-option': isLast && mxEditorObjectShapeDetails.object_type_attributes[0].attributes.length >= 4 }">
+                                                            <button class="more-btn action-btn"
+                                                                (click)="onShowColorOptions(ai)">
+                                                                <img src="/assets/svgs/more-vertical-ic-2.svg"
+                                                                    alt="More icon">
+                                                            </button>
+                                                            <div class="dropdown-wrap"
+                                                                [ngClass]="showAttributeColorId == ai.attribute_id ? 'd-block' : 'd-none'">
+                                                                <div class="dropdown-info">
+                                                                    <button (click)="onColorSet(ai)">Color</button>
+                                                                    <button (click)="onHeatmap(ai)">Heatmap</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ng-container>
+                                            </ng-container>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="card select-card"
+                                    *ngFor="let tab of mxEditorObjectShapeDetails.object_type_attributes[0].tabs">
+                                    <ng-container *ngIf="tab.name != 'General'">
+                                        <div class="card-header d-flex justify-content-between cursor-pointer"
+                                            (click)="onToggleAttributeTab(tab)">
+                                            <span>{{ tab.name }}</span>
+                                            <img src="/assets/svgs/chevron-down.svg" class="gray-icon arrow-icon"
+                                                [ngClass]="{ 'transform-180': !tab.collapsed }">
+                                        </div>
+                                        <div class="card-body" [ngClass]="{ 'd-none': tab.collapsed }">
+                                            <ul class="info-lists">
+                                                <li class="list-item"
+                                                    *ngFor="let ai of filterTabAttributes(tab.attribute_ids, mxEditorObjectShapeDetails.object_type_attributes[0].attributes); last as isLast">
+                                                    <div class="info">
+                                                        <span class="label">
+                                                            {{ ai.name }}
+                                                        </span>
+                                                        <h5>{{ renderPropertiesValue(ai,true) }}</h5>
+                                                    </div>
+                                                    <div class="float-right color-options"
+                                                        [ngClass]="{ 'options-shown': showAttributeColorId == ai.attribute_id, 'last-attribute-option': isLast && mxEditorObjectShapeDetails.object_type_attributes[0].attributes.length >= 4 }">
+                                                        <button class="more-btn action-btn"
+                                                            (click)="onShowColorOptions(ai)">
+                                                            <img src="/assets/svgs/more-vertical-ic-2.svg"
+                                                                alt="More icon">
+                                                        </button>
+                                                        <div class="dropdown-wrap"
+                                                            [ngClass]="showAttributeColorId == ai.attribute_id ? 'd-block' : 'd-none'">
+                                                            <div class="dropdown-info">
+                                                                <button (click)="onColorSet(ai)">Color</button>
+                                                                <button (click)="onHeatmap(ai)">Heatmap</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </section>
+                            <section *ngSwitchCase="'object_type'">
+                                <ul class="info-lists">
+                                    <li class="list-item">
+                                        <div class="info">
+                                            <span class="label">
+                                                Object Type Name
+                                            </span>
+                                            <h5>{{ mxEditorObjectShapeDetails.object_type_name }}</h5>
+                                        </div>
+                                    </li>
+                                    <li class="list-item">
+                                        <div class="info">
+                                            <span class="label">
+                                                Shape Name
+                                            </span>
+                                            <h5>{{ mxEditorObjectShapeDetails.shape_name ?
+                                                mxEditorObjectShapeDetails.shape_name : 'N/A' }}</h5>
+                                        </div>
+                                    </li>
+                                    <li class="list-item">
+                                        <div class="info">
+                                            <span class="label">
+                                                Shape Library
+                                            </span>
+                                            <h5>{{ mxEditorObjectShapeDetails.library_name ?
+                                                mxEditorObjectShapeDetails.library_name : 'N/A' }}</h5>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </section>
+                            <section *ngSwitchCase="'relationship'">
+                                <div class="card select-card">
+                                    <div class="card-header d-flex justify-content-between cursor-pointer"
+                                        (click)="onToggleGeneralTab()">
+                                        <span>General</span>
+                                        <img src="/assets/svgs/chevron-down.svg" class="gray-icon arrow-icon"
+                                            [ngClass]="{ 'transform-180': generalTabExpanded }">
+                                    </div>
+                                    <div class="card-body" [ngClass]="{ 'd-none': !generalTabExpanded }">
+                                        <ul class="info-lists">
+                                            <li class="list-item">
+                                                <div class="info">
+                                                    <span class="label">
+                                                        Relationship Type Name
+                                                    </span>
+                                                    <h5>{{ mxEditorObjectShapeDetails.relationship_type_name }}</h5>
+                                                </div>
+                                            </li>
+                                            <li class="list-item">
+                                                <div class="info">
+                                                    <span class="label">
+                                                        From Object
+                                                    </span>
+                                                    <h5>{{ mxEditorObjectShapeDetails.from_object_name ?
+                                                        mxEditorObjectShapeDetails.from_object_name : 'N/A' }}</h5>
+                                                </div>
+                                            </li>
+                                            <li class="list-item">
+                                                <div class="info">
+                                                    <span class="label">
+                                                        To Object
+                                                    </span>
+                                                    <h5>{{ mxEditorObjectShapeDetails.to_object_name ?
+                                                        mxEditorObjectShapeDetails.to_object_name : 'N/A' }}</h5>
+                                                </div>
+                                            </li>
+                                            <li class="list-item">
+                                                <div class="info">
+                                                    <span class="label">
+                                                        Shape Name
+                                                    </span>
+                                                    <h5>{{ mxEditorObjectShapeDetails.shape_name ?
+                                                        mxEditorObjectShapeDetails.shape_name : 'N/A' }}</h5>
+                                                </div>
+                                            </li>
+                                            <li class="list-item">
+                                                <div class="info">
+                                                    <span class="label">
+                                                        Shape Library
+                                                    </span>
+                                                    <h5>{{ mxEditorObjectShapeDetails.library_name ?
+                                                        mxEditorObjectShapeDetails.library_name : 'N/A' }}</h5>
+                                                </div>
+                                            </li>
+
+                                            <ng-container *ngFor="let tab of mxEditorObjectShapeDetails.attribute_tabs">
+                                                <ng-container *ngIf="tab.name == 'General'">
+                                                    <li class="list-item"
+                                                        *ngFor="let ai of filterTabAttributes(tab.attribute_ids, mxEditorObjectShapeDetails.attributes); last as isLast">
+                                                        <div class="info">
+                                                            <span class="label">
+                                                                {{ ai.name }}
+                                                            </span>
+                                                            <h5>{{ renderPropertiesValue(ai,true) }}</h5>
+                                                        </div>
+
+                                                    </li>
+                                                </ng-container>
+                                            </ng-container>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="card select-card"
+                                    *ngFor="let tab of mxEditorObjectShapeDetails.attribute_tabs">
+                                    <ng-container *ngIf="tab.name != 'General'">
+                                        <div class="card-header d-flex justify-content-between cursor-pointer"
+                                            (click)="onToggleAttributeTab(tab)">
+                                            <span>{{ tab.name }}</span>
+                                            <img src="/assets/svgs/chevron-down.svg" class="gray-icon arrow-icon"
+                                                [ngClass]="{ 'transform-180': !tab.collapsed }">
+                                        </div>
+                                        <div class="card-body" [ngClass]="{ 'd-none': tab.collapsed }">
+                                            <ul class="info-lists">
+                                                <li class="list-item"
+                                                    *ngFor="let ai of filterTabAttributes(tab.attribute_ids, mxEditorObjectShapeDetails.attributes); last as isLast">
+                                                    <div class="info">
+                                                        <span class="label">
+                                                            {{ ai.name }}
+                                                        </span>
+                                                        <h5>{{ renderPropertiesValue(ai,true) }}</h5>
+                                                    </div>
+
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </section>
+
+                            <section *ngSwitchCase="'relationship_type'">
+                                <ul class="info-lists">
+                                    <li class="list-item">
+                                        <div class="info">
+                                            <span class="label">
+                                                Relationship Type Name
+                                            </span>
+                                            <h5>{{ mxEditorObjectShapeDetails.relationship_type_name }}</h5>
+                                        </div>
+                                    </li>
+                                    <li class="list-item">
+                                        <div class="info">
+                                            <span class="label">
+                                                Shape Name
+                                            </span>
+                                            <h5>{{ mxEditorObjectShapeDetails.shape_name ?
+                                                mxEditorObjectShapeDetails.shape_name : 'N/A' }}</h5>
+                                        </div>
+                                    </li>
+                                    <li class="list-item">
+                                        <div class="info">
+                                            <span class="label">
+                                                Shape Library
+                                            </span>
+                                            <h5>{{ mxEditorObjectShapeDetails.library_name ?
+                                                mxEditorObjectShapeDetails.library_name : 'N/A' }}</h5>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </section>
+                            <section *ngSwitchCase="'not_found'">
+                                <div class="alert alert-info">No associated items found</div>
+                            </section>
+                        </ng-container>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+<ng-template #objectDiagramsModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title text-center">
+            Linked Diagrams
+        </h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('dismiss')">
+            <span aria-hidden="true">
+                <img src="/assets/svgs/modal-x-ic.svg" alt="X icon">
+            </span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="text-center mb-4 mt-4" *ngIf="isLoadingObjectDiagrams">
+            <img src="/assets/img/loader.gif" class="w18">
+            Loading
+        </div>
+    </div>
+    <div class="load-more-wrap"
+        *ngIf="currentObjectDiagramsPage && currentObjectDiagramsPage < linkedObjectDiagramPages">
+        <div class="content-details list-view">
+            <div class="row m-0">
+                <div class="col-12 px-0 data-nav">
+                    <table class="table">
+                        <tbody>
+                            <tr class="list-item" *ngFor="let item of linkedObjectDiagrams">
+                                <td class="data-call">
+                                    <div class="d-flex align-items-center">
+                                        <div class="title-holder d-flex align-items-center w-100">
+                                            <span class="cursor-pointer"
+                                                [routerLink]="'/publications/diagram/' + item.diagram_id">
+                                                <img class="default-icon" src="/assets/svgs/diagram-icon-small.svg"
+                                                    alt="Diagram Type Icon">
+                                                <img class="dark-active" src="/assets/svgs/diagram-icon-small-red.svg"
+                                                    alt="Diagram Type Icon">
+                                            </span>
+                                            <dfn class="cursor-pointer"
+                                                [routerLink]="'/publications/diagram/' + item.diagram_id">{{ item.name
+                                                }}</dfn>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <section *ngIf="isLoadingObjectDiagrams" class="mt-1">
+            <img src="/assets/img/loader.gif" class="w24 vertical-align-middle mr-1">
+            <b>Loading</b>
+        </section>
+        <button class="btn mb-4" (click)="loadObjectDiagrams(currentObjectDiagramsPage + 1)"
+            *ngIf="!isLoadingObjectDiagrams">Load more</button>
+    </div>
+</ng-template>

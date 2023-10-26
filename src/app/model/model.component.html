@@ -1,0 +1,544 @@
+<app-master-layout></app-master-layout>
+<section [ngClass]="{ 'display-hidden': globalViewMode != 'manager' }">
+  <div class="content-wrapper">
+    <div class="content-wrapper__data-title">
+      <div class="row data-highlight d-flex align-items-center m-0">
+        <div
+          class="title-holder col-lg-auto col-12 d-flex align-items-center p-0"
+        >
+          <span>
+            <img class="default-icon" src="/assets/svgs/folder-ic.svg" />
+            <img class="hover-icon" src="/assets/svgs/folder-ic-red.svg" />
+          </span>
+          <h3>Model Manager</h3>
+        </div>
+        <div
+          class="btn-wrapper action-triger-wrap btn__inline col-lg-auto col-6 col-md-12 mt-3 mt-md-4 mt-lg-0 d-flex justify-content-xl-end p-0 ml-auto"
+        >
+          <a
+            *ngIf="selectedTreeItems.length"
+            (click)="onDeleteMultipleModels()"
+            class="btn transparent-btn medium ml-0"
+          >
+            <span class="icon-wrap">
+              <img
+                class="default-icon"
+                src="/assets/svgs/trash-ic.svg"
+                alt="Trash icon "
+              />
+              <img
+                class="dark-active"
+                src="/assets/svgs/trash-ic-white.svg"
+                alt="Trash icon Red"
+              />
+            </span>
+            <dfn class="d-none d-md-block"
+              >Delete Selected ({{ selectedTreeItems.length }})</dfn
+            >
+          </a>
+          <a
+            (click)="onOpenNewModelModal({})"
+            class="btn transparent-btn small"
+            *ngIf="allowAddNewModel"
+          >
+            <span class="icon-wrap">
+              <img
+                class="default-icon"
+                src="/assets/svgs/plus-ic.svg"
+                alt="Plus icon "
+              />
+              <img
+                class="dark-active"
+                src="/assets/svgs/plus-ic-white.svg"
+                alt="Plus icon Red"
+              />
+            </span>
+            <span class="d-md-none icon-wrap">
+              <img src="/assets/svgs/box-ic.svg" alt="box icon " />
+              <img src="/assets/svgs/box-ic-red.svg" alt="box icon " />
+            </span>
+            <dfn class="d-none d-md-inline-block">New Model</dfn>
+          </a>
+          <a
+            (click)="onOpenNewFolderModal({})"
+            class="btn transparent-btn small"
+            *ngIf="allowAddNewFolder"
+          >
+            <span class="icon-wrap">
+              <img
+                class="default-icon"
+                src="/assets/svgs/plus-ic.svg"
+                alt="Plus icon "
+              />
+              <img
+                class="dark-active"
+                src="/assets/svgs/plus-ic-white.svg"
+                alt="Plus icon Red"
+              />
+            </span>
+            <span class="d-md-none icon-wrap">
+              <img src="/assets/svgs/folder-ic.svg" alt="folder icon " />
+              <img src="/assets/svgs/folder-ic-red.svg" alt="folder icon " />
+            </span>
+            <dfn class="d-none d-md-block">New Folder</dfn>
+          </a>
+          <a
+            *ngIf="selectedTreeModelIds.length"
+            class="btn transparent-btn small"
+            (click)="openSelectedModels()"
+          >
+            <dfn class="d-none d-md-block"
+              >Open Selected ({{ selectedTreeModelIds.length }})</dfn
+            >
+          </a>
+        </div>
+      </div>
+    </div>
+    <!--        <div class="model-root-drop" *ngIf="showRootDropContainer">Drop to Root</div>-->
+    <div class="model-root-drop" id="0" *ngIf="showRootDropContainer">
+      Drop to Root
+    </div>
+    <div
+      class="content-details ptl-5 list-view"
+      (contextmenu)="onModelManagerRootOptions($event); $event.preventDefault()"
+    >
+      <div
+        class="row m-0 data-expand-wrap pt-2"
+        *ngIf="managerViewMode == 'tree-view'"
+      >
+        <div class="col-12 px-0">
+          <ul class="d-flex data-nav">
+            <li id="main_0" class="list-item list-heading">
+              <div
+                class="row data-highlight-info"
+                style="padding-bottom: 10px; padding-top: 10px"
+              >
+                <div
+                  class="col-auto data-call cursor-pointer"
+                  style="padding-left: 0px"
+                >
+                  <div
+                    class="d-flex align-items-center"
+                    style="padding-left: 30px"
+                  >
+                    <div class="check-wrap">
+                      <input
+                        type="checkbox"
+                        id="select-all"
+                        (change)="selectAllRecords($event)"
+                        [checked]="isAllReSelected"
+                      />
+                      <label for="select-all"></label>
+                    </div>
+                    <div
+                      (click)="sortBy('name')"
+                      class="cursor-pointer"
+                      style="padding-left: 30px"
+                    >
+                      NAME
+                      <img
+                        src="/assets/svgs/chevron-up-ic.svg"
+                        class="sort-icon"
+                        [ngClass]="{
+                          'display-hidden': defaultSort != 'name_asc'
+                        }"
+                      />
+                      <img
+                        src="/assets/svgs/chevron-down-ic.svg"
+                        class="sort-icon"
+                        [ngClass]="{
+                          'display-hidden': defaultSort != 'name_desc'
+                        }"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="col-auto cursor-pointer"
+                  (click)="sortBy('created')"
+                >
+                  CREATED ON
+                  <img
+                    src="/assets/svgs/chevron-down-ic.svg"
+                    class="sort-icon"
+                    [ngClass]="{
+                      'display-hidden': defaultSort != 'created_desc'
+                    }"
+                  />
+                  <img
+                    src="/assets/svgs/chevron-up-ic.svg"
+                    class="sort-icon"
+                    [ngClass]="{
+                      'display-hidden': defaultSort != 'created_asc'
+                    }"
+                  />
+                </div>
+                <div
+                  class="col-auto cursor-pointer"
+                  (click)="sortBy('updated')"
+                >
+                  UPDATED ON
+                  <img
+                    src="/assets/svgs/chevron-down-ic.svg"
+                    class="sort-icon"
+                    [ngClass]="{
+                      'display-hidden': defaultSort != 'updated_desc'
+                    }"
+                  />
+                  <img
+                    src="/assets/svgs/chevron-up-ic.svg"
+                    class="sort-icon"
+                    [ngClass]="{
+                      'display-hidden': defaultSort != 'updated_asc'
+                    }"
+                  />
+                </div>
+                <div
+                  class="col-auto cursor-pointer"
+                  (click)="sortBy('created_by')"
+                >
+                  CREATED BY
+                  <img
+                    src="/assets/svgs/chevron-down-ic.svg"
+                    class="sort-icon"
+                    [ngClass]="{
+                      'display-hidden': defaultSort != 'created_by_desc'
+                    }"
+                  />
+                  <img
+                    src="/assets/svgs/chevron-up-ic.svg"
+                    class="sort-icon"
+                    [ngClass]="{
+                      'display-hidden': defaultSort != 'created_by_asc'
+                    }"
+                  />
+                </div>
+                <div
+                  class="col-auto updated-by cursor-pointer"
+                  (click)="sortBy('last_update_by')"
+                >
+                  Last Updated by
+                  <img
+                    src="/assets/svgs/chevron-down-ic.svg"
+                    class="sort-icon"
+                    [ngClass]="{
+                      'display-hidden': defaultSort != 'last_update_by_desc'
+                    }"
+                  />
+                  <img
+                    src="/assets/svgs/chevron-up-ic.svg"
+                    class="sort-icon"
+                    [ngClass]="{
+                      'display-hidden': defaultSort != 'last_update_by_asc'
+                    }"
+                  />
+                </div>
+                <div class="col-auto action-call">&nbsp;</div>
+              </div>
+            </li>
+            <div
+              cdkDropList
+              (cdkDropListDropped)="drop($event)"
+              [cdkDropListSortingDisabled]="true"
+            >
+              <app-model-manager-tree
+                class="model-manager-tree"
+                [viewMode]="managerViewMode"
+                [items]="modelFolderItems"
+                [level]="1"
+                [parentId]="0"
+                [parentType]="''"
+                [parentPages]="modelFolderItems.pages"
+                [loggedInUser]="loggedInUser"
+                [modelFolderCopyOptions]="modelFolderCopyOptions"
+                [defaultSort]="defaultSort"
+                [showFolderCheckboxes]="true"
+                [showActionMenu]="true"
+                [showSystemFields]="true"
+                [modelBrowserSocket]="modelBrowserSocket"
+                [allowExpandModels]="false"
+                [publicationModelTree]="false"
+              >
+              </app-model-manager-tree>
+            </div>
+          </ul>
+        </div>
+      </div>
+      <div class="load-more-wrap" *ngIf="showPagination">
+        <section *ngIf="modelsLoading" class="mt-1">
+          <img
+            src="/assets/img/loader.gif"
+            class="w24 vertical-align-middle mr-1"
+          />
+          <b>Loading</b>
+        </section>
+        <button
+          class="btn"
+          (click)="loadModels(currentPage + 1)"
+          *ngIf="!modelsLoading"
+        >
+          Load more
+        </button>
+      </div>
+      <div
+        class="col-auto action-call position-relative float-left model_root_paste_container"
+        *ngIf="modelFolderRootContextOptions.show"
+        [ngStyle]="{ left: modelFolderRootContextOptions.left + 'px' }"
+      >
+        <div
+          class="action-hold d-flex align-items-center options-shown float-menu-no-box"
+        >
+          <div class="dropdown-wrap top-n-13">
+            <div class="dropdown-info rightBoxModalHeightForOneOption">
+              <button (click)="onRootPasteProcess()">Paste</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template #createFolderModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title text-center">
+        {{
+          modelFolderCreateOptions.is_update ? "Edit Folder" : "Create Folder"
+        }}
+      </h4>
+      <button
+        type="button"
+        class="close"
+        data-dismiss="modal"
+        aria-label="Close"
+        (click)="modal.dismiss('dismiss')"
+      >
+        <span aria-hidden="true">
+          <img src="/assets/svgs/modal-x-ic.svg" alt="X icon" />
+        </span>
+      </button>
+    </div>
+    <form
+      *ngIf="managerFolderCreateForm"
+      [formGroup]="managerFolderCreateForm"
+      (ngSubmit)="onManagerModelFolderSave(modelFolderCreateOptions)"
+    >
+      <div class="modal-body">
+        <div class="form-group">
+          <input
+            type="text"
+            class="form-control"
+            formControlName="name"
+            id="name"
+            placeholder="Folder Name"
+          />
+          <span
+            class="red mb-2"
+            *ngIf="
+              hasFolderCreateFormSubmitted &&
+              !managerFolderCreateForm.controls.name.valid
+            "
+            >Required</span
+          >
+        </div>
+      </div>
+      <div class="text-center mb-4 mt-4" *ngIf="showAddFolderLoading">
+        <img src="/assets/img/loader.gif" class="w24" />
+        Processing your request
+      </div>
+      <div
+        class="modal-footer justify-content-center"
+        *ngIf="!showAddFolderLoading"
+      >
+        <button
+          type="button"
+          class="btn transparent-btn"
+          data-dismiss="modal"
+          (click)="modal.dismiss('dismiss')"
+        >
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-red">Create</button>
+      </div>
+    </form>
+  </ng-template>
+  <ng-template #createModelModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title text-center">Create Model</h4>
+      <button
+        type="button"
+        class="close"
+        data-dismiss="modal"
+        aria-label="Close"
+        (click)="modal.dismiss('dismiss')"
+      >
+        <span aria-hidden="true">
+          <img src="/assets/svgs/modal-x-ic.svg" alt="X icon" />
+        </span>
+      </button>
+    </div>
+    <form
+      [formGroup]="managerModelCreateForm"
+      (ngSubmit)="onManagerModelSave(modelModelCreateOptions)"
+    >
+      <div class="modal-body">
+        <div class="form-group">
+          <input
+            type="text"
+            class="form-control"
+            formControlName="name"
+            placeholder="Model Name"
+          />
+          <span
+            class="red mb-2"
+            *ngIf="
+              hasModelCreateFormSubmitted &&
+              !managerModelCreateForm.controls.name.valid
+            "
+            >Required</span
+          >
+        </div>
+        <div class="form-group select-wrapper">
+          <ng-select
+            class="ng-dropdown"
+            formControlName="metamodel_id"
+            [items]="availableMetamodels"
+            [searchable]="true"
+            [clearable]="false"
+            [placeholder]="'Primary Metamodel'"
+            [multiple]="true"
+            bindLabel="name"
+            bindValue="metamodel_id"
+            (search)="onMetamodelSearch($event)"
+          ></ng-select>
+          <span
+            class="red mb-2"
+            *ngIf="
+              hasModelCreateFormSubmitted &&
+              !managerModelCreateForm.controls.metamodel_id.valid
+            "
+            >Required</span
+          >
+        </div>
+        <div class="form-group select-wrapper">
+          <ng-select
+            class="ng-dropdown"
+            formControlName="other_metamodel_id"
+            [items]="availableOtherMetamodels"
+            [searchable]="true"
+            [clearable]="false"
+            [placeholder]="'Other Metamodel(s)'"
+            [multiple]="true"
+            bindLabel="name"
+            bindValue="other_metamodel_id"
+            (search)="onOtherMetamodelSearch($event)"
+          ></ng-select>
+        </div>
+      </div>
+      <div class="text-center mb-4 mt-4" *ngIf="showAddModelLoading">
+        <img src="/assets/img/loader.gif" class="w24" />
+        Processing your request
+      </div>
+      <div
+        class="modal-footer justify-content-center"
+        *ngIf="!showAddModelLoading"
+      >
+        <button
+          type="button"
+          class="btn transparent-btn"
+          data-dismiss="modal"
+          (click)="modal.dismiss('dismiss')"
+        >
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-red">Create</button>
+      </div>
+    </form>
+  </ng-template>
+</section>
+<section *ngIf="globalViewMode == 'editor'">
+  <app-view-model
+    [modelIds]="selectedTreeModelIds"
+    (exportViewMode)="onManagerCloseWindow($event)"
+  ></app-view-model>
+</section>
+<ng-template #deleteSelectedModelFolderModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">Confirmation Required</h4>
+    <button
+      type="button"
+      class="close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('dismiss')"
+    >
+      <span aria-hidden="true">
+        <img src="/assets/svgs/modal-x-ic.svg" alt="X icon" />
+      </span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <div class="mb-2">Are you sure you want to delete following item(s)?</div>
+      <ul class="mt-2 list-unstyled">
+        <li class="mb-1" *ngFor="let item of deleteCustomSelected">
+          <div class="folder-model-box-sm no-border">
+            <div class="check-wrap float-left mr-2">
+              <input
+                type="checkbox"
+                [id]="'custom_delete_item_' + item.id"
+                [checked]="item.checked ? true : false"
+                [name]="'custom_delete_item_' + item.id"
+                (change)="onCustomDeleteItemChanged($event, item)"
+              />
+              <label [for]="'custom_delete_item_' + item.id"></label>
+            </div>
+            <span *ngIf="item.type == 'folder'">
+              <img src="/assets/svgs/folder-ic.svg" class="static-icon" />
+              <img src="/assets/svgs/folder-ic-red.svg" class="dark-active" />
+            </span>
+            <span *ngIf="item.type == 'model'">
+              <img src="/assets/svgs/box-ic.svg" class="static-icon" />
+              <img src="/assets/svgs/box-ic-red.svg" class="dark-active" />
+            </span>
+            <span class="ml-1">{{ item.name }}</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="modal-footer" *ngIf="deleteCustomSelectedTotal">
+    <div class="row row-cols-1 row-cols-sm-2 no-gutters m-0">
+      <div class="col pr-sm-2">
+        <button
+          type="button"
+          class="btn transparent-btn w-100"
+          data-dismiss="modal"
+          (click)="modal.dismiss('dismiss')"
+        >
+          No
+        </button>
+      </div>
+      <div class="col pl-sm-2">
+        <button
+          type="button"
+          class="btn btn-red w-100"
+          (click)="onCustomDeleteProcess()"
+        >
+          Yes
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #copyPasteModelFolderModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title text-center">Processing</h5>
+  </div>
+  <div class="modal-body">
+    <img src="/assets/img/loader.gif" class="w18" />
+    Copying
+    <span class="text-bold">{{ modelFolderCopyOptions.name }}</span> into
+    <span class="text-bold">{{ modelFolderPasteOptions.name }}</span> please
+    stand by
+    <div class="mb-4"></div>
+  </div>
+</ng-template>

@@ -1,0 +1,94 @@
+<app-master-layout></app-master-layout>
+<div class="content-wrapper types-editor">
+    <div class="content-wrapper__data-title">
+        <div class="row data-highlight d-flex align-items-center m-0">
+            <div class="title-holder col-lg-auto col-12 d-flex align-items-center p-0">
+                <button class="btn back-btn" routerLink="/metamodel/metamodel-manager">
+                    <img class="default-icon" src="/assets/svgs/arrow-left-ic.svg" alt="Left arrow">
+                    <img class="hover-icon" src="/assets/svgs/arrow-left-ic-red.svg" alt="Left arrow red">
+                </button>
+                <h3>Metamodel Editor</h3>
+            </div>
+            <div class="btn-wrapper action-triger-wrap transparent-btn btn__inline d-flex align-items-center col-lg-auto col-12 col-sm-6 col-md-12 mt-3 mt-sm-0 mt-md-4 mt-lg-0 p-0 ml-sm-auto">
+                <button type="button" class="btn ml-sm-auto ml-md-0 ml-lg-auto transparent-btn" routerLink="/metamodel/metamodel-manager" *ngIf="!isLoading">
+                    <img src="/assets/svgs/discard-trash-ic.svg" alt="Trash icon" class="icon">
+                    Discard
+                </button>
+                <button type="button" (click)="onMetamodelUpdate()" class="btn transparent-btn fill" *ngIf="!isLoading">
+                    <img src="/assets/svgs/save-ic-white.svg" alt="Save icon" class="icon">
+                    Save
+                </button>
+                <div *ngIf="isLoading">
+                    <img src="/assets/img/loader.gif" class="w24">
+                    Processing your request
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="type-editor-content tween-col">
+        <div class="row">
+            <div class="col-12">
+                <div class="item-nav">
+                    <a class="cursor-pointer" [ngClass]="{ 'active' : currentActiveTab == 'object_types' }" (click)="onTabChange('object_types')">Object Types</a>
+                    <a class="cursor-pointer" [ngClass]="{ 'active': currentActiveTab == 'relationship_types' }" (click)="onTabChange('relationship_types')">Relationship Types</a>
+                    <a class="cursor-pointer" [ngClass]="{ 'active': currentActiveTab == 'diagram_types' }" (click)="onTabChange('diagram_types')">Diagram Types</a>
+                </div>
+            </div>
+        </div>
+        <div class="row no-gutters">
+            <div class="col-12 col-md-auto options-col w-100">
+                <form [formGroup]="form" (ngSubmit)="onMetamodelUpdate()" *ngIf="firstLoad">
+                    <section class="options-wrap">
+                        <section [ngClass]="{ 'display-hidden': currentActiveTab != 'object_types' }">
+                            <div class="header">
+                                <div class="row no-gutters">
+                                    <div class="col-12 type-name">
+                                        <div class="form-group">
+                                            <label for="name">Metamodel Name</label>
+                                            <input type="text" class="form-control" formControlName="name" id="name">
+                                            <span class="position-absolute red" *ngIf="hasFormSubmitted && !form.controls.name.valid">Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-2">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" formControlName="default" class="custom-control-input" id="default">
+                                            <label class="custom-control-label" for="default"></label>
+                                            <span class="ml-2 position-relative top-6">Default</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="body">
+                                <app-dual-list-box [available_label]="'Object Types Available'" [selected_label]="'Object Types Assigned'" [available_types]="objectTypes" [selected_types]="preSelectedObjectTypes" (exportSelectedTypes)="exportSelectedObjectTypes($event)"></app-dual-list-box>
+                            </div>
+                        </section>
+                        <section [ngClass]="{ 'display-hidden': currentActiveTab != 'relationship_types' }">
+                            <!-- [addition_right_content]='selectedRelationshipTypeParentChilds' -->
+                            <div class="body">
+                                <app-dual-list-box [available_label]="'Relationship Types Available'" [selected_label]="'Relationship Types Assigned'" [available_types]="relationshipTypes" [selected_types]="preSelectedRelationshipTypes" (exportSelectedTypes)="exportSelectedRelationshipTypes($event)"
+                                    [display-add-right-content]="true">
+                                    <div addition_right_content>
+                                        <div class="form-wrap" *ngFor="let item of selectedRelationshipListTypes">
+                                            <div class="load-text" style="display: flex;">
+                                                <input type="radio" name="" style="width: 16px;
+                                                height: 15px;" id="" [checked]="item.parentChild==true"
+                                                    (change)="onRelationParentChildItemSelect($event,item.id)" name="item.name"
+                                                     [value]="'label-parentchild' + item.id" [id]="'label-parentchild' + item.id">
+                                                <div class="checkbox"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </app-dual-list-box>
+                            </div>
+                        </section>
+                        <section [ngClass]="{ 'display-hidden': currentActiveTab != 'diagram_types' }">
+                            <div class="body">
+                                <app-dual-list-box [available_label]="'Diagram Types Available'" [selected_label]="'Diagram Types Assigned'" [available_types]="diagramTypes" [selected_types]="preSelectedDiagramTypes" (exportSelectedTypes)="exportSelectedDiagramTypes($event)"></app-dual-list-box>
+                            </div>
+                        </section>
+                    </section>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

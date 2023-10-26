@@ -1,0 +1,48 @@
+gridster {
+    height: 100%;
+    width: 100vw;
+}
+.innerContainerProp {
+    min-height: 65vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contentAlignment{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.alignment{
+    width: 120px;
+    height: 120px;
+}
+.view-model-scroll {
+    height: 30rem;
+    overflow-y: scroll;
+}
+
+.body-box  {
+    min-height: 40rem;
+}
+
+.body-flex {
+    display: flex;
+}
+
+.text-overflow-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+::ng-deep .cus-dropdown.ng-select-opened{
+    overflow: visible !important;
+    border: 2px solid #5092f3 !important;
+    transition: 0s;
+}
+.tols-btn.num-of-lvls{
+    width: 140px !important ; 
+}

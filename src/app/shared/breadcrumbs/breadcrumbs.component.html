@@ -1,0 +1,5 @@
+<div class="breadcrumbs">
+    <a href="#" *ngFor="let item of breadcrumbs; let last = last;" [ngClass]="{'active': last}">
+        {{ item.name }}
+    </a>
+</div>

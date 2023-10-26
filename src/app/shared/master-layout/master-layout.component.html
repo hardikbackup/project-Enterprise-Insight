@@ -1,0 +1,172 @@
+<app-header [stand_alone_header]="false" [show_environment]="true"></app-header>
+<aside id="left_sidebar_menu" class="sidebar show" *ngIf="!hide_sidebar">
+    <div class="sidebar__inner">
+        <button class="d-xl-none sidebar__close">x</button>
+        <div class="sidebar__brand">
+            <a routerLink="/dashboard" class="sidebar__brand-logo">
+                <img class="default-icon" src="/assets/svgs/main-logo.svg" alt="Brand logo Enterprise Insight">
+                <img class="dark-active" src="/assets/svgs/main-logo-whtie.svg" alt="Brand logo Enterprise Insight">
+            </a>
+        </div>
+        <div class="sidebar__top">
+            <a routerLink="/dashboard" class="sidebar__top-heading sidebar__top-heading-logo">
+                <span>
+                    <img class="default-icon" src="/assets/svgs/home-ic.svg" alt="Home">
+                    <img class="hover-icon" src="/assets/svgs/home-ic-white.svg" alt="Home">
+                    <img class="dark-active" src="/assets/svgs/home-ic-red.svg" alt="Home">
+                </span>
+                <dfn>Home</dfn>
+            </a>
+        </div>
+        <div class="sidebar__menu">
+            <div class="sidebar__menu-item">
+                <div class="sidebar__menu-heading">
+                    Model
+                </div>
+                <ul class="sidebar__menu-item sidebar__menu-item-nav flex-column">
+                    <li class="nav-item" [ngClass]="{'active': activePage == 'models'}">
+                        <a routerLink="/model" class="nav-link">
+                            <span>
+                                <img class="default-icon" src="/assets/svgs/folder-ic.svg" alt="Folder icon">
+                                <img class="hover-icon" src="/assets/svgs/folder-ic-red.svg" alt="Folder icon red">
+                                <img class="dark-active" src="/assets/svgs/folder-ic-white.svg" alt="Folder icon white">
+                            </span>
+                            <dfn>Model Manager</dfn>
+                        </a>
+                    </li>
+                    <li class="nav-item" [ngClass]="{'active': activePage == 'publications'}">
+                        <a routerLink="/publications" class="nav-link">
+                            <span>
+                                <img class="default-icon" src="/assets/svgs/file-text-ic.svg" alt="File text icon">
+                                <img class="hover-icon" src="/assets/svgs/file-text-ic-red.svg" alt="File text icon red">
+                                <img class="dark-active" src="/assets/svgs/file-text-ic-white.svg" alt="File text icon white">
+                            </span>
+                            <dfn>Publications</dfn>
+                        </a>
+                    </li>
+                    <li class="nav-item" [ngClass]="{'active': activePage == 'data-connectors'}">
+                        <a routerLink="/data-connectors" class="nav-link">
+                            <span>
+                                <img class="default-icon" src="/assets/svgs/repeat-ic.svg" alt="Folder icon">
+                                <img class="hover-icon" src="/assets/svgs/repeat-ic-red.svg" alt="Folder icon red">
+                                <img class="dark-active" src="/assets/svgs/repeat-ic-white.svg" alt="Folder icon white">
+                            </span>
+                            <dfn>Data Connectors</dfn>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a routerLink="/queries" class="nav-link" [ngClass]="{'active': activePage == 'queries'}">
+                            <span>
+                                <img class="default-icon" src="/assets/svgs/alert-circle-ic.svg" alt="Alert icon">
+                                <img class="hover-icon" src="/assets/svgs/alert-circle-ic-red.svg" alt="Alert icon red">
+                                <img class="dark-active" src="/assets/svgs/alert-circle-ic-white.svg" alt="Alert icon white">
+                            </span>
+                            <dfn>Queries</dfn>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <ng-container *ngIf="adminUser">
+            <div class="sidebar__menu-item">
+                <div class="sidebar__menu-heading">
+                    Metamodel
+                </div>
+                <ul class="sidebar__menu-item sidebar__menu-item-nav flex-column">
+                    <li class="nav-item" [ngClass]="{'active': activePage == 'metamodel-manager'}">
+                        <a routerLink="/metamodel/metamodel-manager" class="nav-link">
+                            <span>
+                                <img class="default-icon" src="/assets/svgs/metamodel-ic-dark.svg" alt="Metamodel icon">
+                                <img class="hover-icon" src="/assets/svgs/metamodel-ic-red.svg" alt="Metamodel icon red">
+                                <img class="dark-active" src="/assets/svgs/metamodel-ic-white.svg" alt="Metamodel icon white">
+                            </span>
+                            <dfn>Metamodel Manager</dfn>
+                        </a>
+                    </li>
+                    <li class="nav-item" [ngClass]="{'active': activePage == 'object-types'}">
+                        <a class="nav-link" routerLink="/metamodel/object-type">
+                            <span>
+                                <img class="default-icon" src="/assets/svgs/object-types-layers-ic.svg" alt="Layer icon">
+                                <img class="hover-icon" src="/assets/svgs/object-types-layers-ic-red.svg" alt="Layer icon red">
+                                <img class="dark-active" src="/assets/svgs/object-type-layers-ic-white.svg" alt="Layer icon white">
+                            </span>
+                            <dfn>Object Types</dfn>
+                        </a>
+                    </li>
+                    <li class="nav-item" [ngClass]="{'active': activePage == 'attribute-types'}">
+                        <a routerLink="/metamodel/attribute-type" class="nav-link">
+                            <span>
+                                <img class="default-icon" src="/assets/svgs/copy-ic.svg" alt="Copy icon">
+                                <img class="hover-icon" src="/assets/svgs/copy-ic-red.svg" alt="Copy icon red">
+                                <img class="dark-active" src="/assets/svgs/copy-ic-white.svg" alt="Copy icon white">
+                            </span>
+                            <dfn>Attribute Types</dfn>
+                        </a>
+                    </li>
+                    <li class="nav-item" [ngClass]="{'active': activePage == 'relationship-types'}">
+                        <a routerLink="/metamodel/relationship-type" class="nav-link">
+                            <span>
+                                <img class="default-icon" src="/assets/svgs/link-ic.svg" alt="Link icon">
+                                <img class="hover-icon" src="/assets/svgs/link-ic-red.svg" alt="link icon red">
+                                <img class="dark-active" src="/assets/svgs/link-ic-white.svg" alt="link icon white">
+                            </span>
+                            <dfn>Relationship Types</dfn>
+                        </a>
+                    </li>
+                    <li class="nav-item" [ngClass]="{'active': activePage == 'diagram-types'}">
+                        <a routerLink="/metamodel/diagram-type" class="nav-link">
+                           <span>
+                                <img class="default-icon" src="/assets/svgs/diagram-type-ic.svg" alt="Diagram type icon">
+                                <img class="hover-icon" src="/assets/svgs/diagram-type-ic-red.svg" alt="Diagram type red">
+                                <img class="dark-active" src="/assets/svgs/diagram-type-ic-white.svg" alt="Diagram type white">
+                            </span>
+                            <dfn>Diagram Types</dfn>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </ng-container>
+            <div class="sidebar__menu-item">
+                
+                <div class="sidebar__menu-heading">
+                    System
+                </div>
+            
+                <ul class="sidebar__menu-item sidebar__menu-item-nav flex-column">
+                    <ng-container *ngIf="adminUser">
+                    <li class="nav-item" [ngClass]="{'active': activePage == 'users'}">
+                        <a routerLink="/administration/users" class="nav-link">
+                            <span>
+                                <img class="default-icon" src="/assets/svgs/user-ic.svg" alt="User icon">
+                                <img class="hover-icon" src="/assets/svgs/user-ic-red.svg" alt="User icon red">
+                                <img class="dark-active" src="/assets/svgs/user-ic-white.svg" alt="User icon white">
+                            </span>
+                            <dfn>Users</dfn>
+                        </a>
+                    </li>
+                
+                    <li class="nav-item" [ngClass]="{'active': activePage == 'user-groups'}">
+                        <a routerLink="/administration/user-groups" class="nav-link">
+                            <span>
+                                <img class="default-icon" src="/assets/svgs/share-2-ic.svg" alt="Shar icon">
+                                <img class="hover-icon" src="/assets/svgs/share-2-ic-red.svg" alt="Shar icon red">
+                                <img class="dark-active" src="/assets/svgs/share-2-ic-white.svg" alt="Shar icon white">
+                            </span>
+                            <dfn>User Groups</dfn>
+                        </a>
+                    </li>
+                </ng-container>
+                    <li class="nav-item" [ngClass]="{'active': activePage == 'settings'}">
+                        <a routerLink="/administration/settings" class="nav-link">
+                                <span>
+                                <img class="default-icon" src="/assets/svgs/settings-ic.svg" alt="Setting icon">
+                                <img class="hover-icon" src="/assets/svgs/settings-ic-red.svg" alt="Setting icon red">
+                                <img class="dark-active" src="/assets/svgs/settings-ic-white.svg" alt="Setting icon white">
+                            </span>
+                            <dfn>Settings</dfn>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</aside>

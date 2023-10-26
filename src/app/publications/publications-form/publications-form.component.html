@@ -1,0 +1,227 @@
+<app-master-layout></app-master-layout>
+<div class="content-wrapper types-editor">
+  <div class="content-wrapper__data-title">
+    <div class="row data-highlight d-flex align-items-center m-0">
+      <div
+        class="title-holder col-lg-auto col-12 d-flex align-items-center p-0"
+      >
+        <button class="btn back-btn" routerLink="/publications">
+          <img
+            class="default-icon"
+            src="/assets/svgs/file-text-ic.svg"
+            alt="File text icon"
+          />
+          <img
+            class="hover-icon"
+            src="/assets/svgs/file-text-ic-red.svg"
+            alt="File text icon red"
+          />
+        </button>
+        <h3>Publication Editor</h3>
+      </div>
+      <div
+        class="btn-wrapper action-triger-wrap transparent-btn btn__inline d-flex align-items-center col-lg-auto col-12 col-sm-6 col-md-12 mt-3 mt-sm-0 mt-md-4 mt-lg-0 p-0 ml-sm-auto"
+      >
+        <button
+          type="button"
+          class="btn ml-sm-auto ml-md-0 ml-lg-auto transparent-btn"
+          routerLink="/publications"
+          *ngIf="!isLoading"
+        >
+          <img
+            src="/assets/svgs/discard-trash-ic.svg"
+            alt="Trash icon"
+            class="icon"
+          />
+          Discard
+        </button>
+        <button
+          type="button"
+          (click)="onPublicationUpdate()"
+          class="btn transparent-btn fill"
+          *ngIf="!isLoading"
+        >
+          <img
+            src="/assets/svgs/save-ic-white.svg"
+            alt="Save icon"
+            class="icon"
+          />
+          Save
+        </button>
+        <div *ngIf="isLoading">
+          <img src="/assets/img/loader.gif" class="w24" />
+          Processing your request
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="type-editor-content tween-col">
+    <div class="row">
+      <div class="col-12">
+        <div class="item-nav">
+          <a
+            class="cursor-pointer"
+            [ngClass]="{ active: currentActiveTab == 'scope' }"
+            (click)="onTabChange('scope')"
+            >Scope of Publication</a
+          >
+          <a
+            class="cursor-pointer"
+            [ngClass]="{ active: currentActiveTab == 'user_groups' }"
+            (click)="onTabChange('user_groups')"
+            >Permissions</a
+          >
+        </div>
+      </div>
+    </div>
+    <div class="row no-gutters">
+      <div class="col-12 col-md-auto options-col w-100">
+        <form
+          [formGroup]="form"
+          (ngSubmit)="onPublicationUpdate()"
+          *ngIf="firstLoad"
+        >
+          <section class="options-wrap">
+            <section
+              [ngClass]="{
+                'display-hidden': currentActiveTab != 'user_groups'
+              }"
+            >
+              <div class="body">
+                <app-dual-list-box
+                  [maxHeight]="280"
+                  [available_label]="'Available Groups'"
+                  
+                                [selected_label]="'Assigned Groups'"
+                  
+                                [available_types]="userGroups"
+                  [selected_types]="selectedUserGroups"
+                  [is_user_groups]="true" 
+                                [special_items] = "specialUserGroups" (exportSelectedTypes)="exportSelectedUserGroups($event)"
+                ></app-dual-list-box>
+              </div>
+            </section>
+            <section
+              [ngClass]="{ 'display-hidden': currentActiveTab != 'scope' }"
+            >
+              <div class="header bb-0">
+                <div class="row no-gutters">
+                  <div class="col-12 type-name mb-2">
+                    <div class="form-group">
+                      <label for="name">Publication Name</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        formControlName="name"
+                        id="name"
+                      />
+                      <span
+                        class="position-absolute red"
+                        *ngIf="hasFormSubmitted && !form.controls.name.valid"
+                        >Required</span
+                      >
+                    </div>
+                  </div>
+                  <div class="w-100">
+                    <div class="form-group select-wrapper">
+                      <ng-select
+                        class="ng-dropdown"
+                        formControlName="diagram_id"
+                        [items]="availableDiagrams"
+                        [searchable]="true"
+                        [clearable]="false"
+                        [placeholder]="'Homepage Diagram'"
+                        bindLabel="name"
+                        bindValue="diagram_id"
+                        groupBy="model_name"
+                        (search)="onDiagramSearch($event)"
+                      >
+                        <ng-template ng-optgroup-tmp let-item="item">
+                          {{ item.model_name }}
+                        </ng-template>
+                        <ng-template ng-option-tmp let-item="item">
+                          <span>
+                            <img
+                              src="/assets/svgs/diagram-icon-small.svg"
+                              class="static-icon"
+                            />
+                            <img
+                              class="dark-active"
+                              src="/assets/svgs/diagram-icon-small-red.svg"
+                            />
+                          </span>
+                          {{ item.name }}
+                        </ng-template>
+                      </ng-select>
+                      <span
+                        class="red mb-2"
+                        *ngIf="
+                          hasFormSubmitted && !form.controls.diagram_id.valid
+                        "
+                        >Required</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="content-details ptl-5 list-view">
+                <div class="row m-0 data-expand-wrap pt-2">
+                  <div class="col-12 px-0">
+                    <ul class="d-flex data-nav" id="main_0">
+                      <li class="list-item list-heading">
+                        <div class="row data-highlight-info">
+                          <div class="col-auto data-call">NAME</div>
+                          <div class="col-auto action-call">&nbsp;</div>
+                        </div>
+                      </li>
+                      <div>
+                        <app-model-manager-tree
+                          class="model-manager-tree"
+                          [viewMode]="'tree-view'"
+                          [items]="modelFolderItems"
+                          [level]="1"
+                          [parentId]="0"
+                          [parentType]="''"
+                          [parentPages]="modelFolderItems.pages"
+                          [loggedInUser]="loggedInUser"
+                          [modelFolderCopyOptions]="{}"
+                          [defaultSort]="modelDefaultSort"
+                          [showFolderCheckboxes]="true"
+                          [showActionMenu]="false"
+                          [showSystemFields]="false"
+                          [modelBrowserSocket]="modelBrowserSocket"
+                          [allowExpandModels]="true"
+                          [publicationModelTree]="true"
+                          [publicationId]="publicationId"
+                          [publicationView]="true"
+                          [checkedModelItems]="checkedModelItems"
+                        >
+                        </app-model-manager-tree>
+                        <div class="load-more-wrap" *ngIf="showPagination">
+                          <section *ngIf="modelsLoading" class="mt-1">
+                            <img
+                              src="/assets/img/loader.gif"
+                              class="w24 vertical-align-middle mr-1"
+                            />
+                            <b>Loading</b>
+                          </section>
+                          <button
+                            class="btn"
+                            (click)="loadModels(currentPage + 1)"
+                            *ngIf="!modelsLoading"
+                          >
+                            Load more
+                          </button>
+                        </div>
+                      </div>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </section>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

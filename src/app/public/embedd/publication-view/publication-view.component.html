@@ -1,0 +1,7 @@
+<ng-container *ngIf="type == 'diagram'">
+    <ng-container *ngIf="publication.diagram_id">
+        <app-diagram-viewer [diagramId]="publication.diagram_id" [isPublicAccess]="true" [standAlonePage]="true"
+          [isShowSidebar]="false" [isDiagramZoom]="false" [publicationId]="publication.id"
+            [diagramSVG]="publication.diagram_svg"></app-diagram-viewer>
+    </ng-container>
+</ng-container>

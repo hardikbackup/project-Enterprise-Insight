@@ -1,0 +1,161 @@
+<app-master-layout></app-master-layout>
+<div class="content-wrapper types-editor">
+    <div class="content-wrapper__data-title">
+        <div class="row data-highlight d-flex align-items-center m-0">
+            <div class="title-holder col-lg-auto col-12 col-sm-6 d-flex align-items-center p-0">
+                <a class="btn back-btn" routerLink="/data-connectors">
+                    <img class="default-icon" src="/assets/svgs/arrow-left-ic.svg" alt="Left arrow">
+                    <img class="hover-icon" src="/assets/svgs/arrow-left-ic-red.svg" alt="Left arrow red">
+                </a>
+                <h3>Data Connectors Editor</h3>
+            </div>
+            <div class="btn-wrapper action-triger-wrap transparent-btn btn__inline d-flex align-items-center col-lg-auto col-12 col-sm-6 col-md-12 mt-3 mt-sm-0 mt-md-4 mt-lg-0 p-0 ml-sm-auto">
+                <button type="button" class="btn ml-sm-auto ml-md-0 ml-lg-auto transparent-btn" routerLink="/data-connectors" *ngIf="!isLoading">
+                    <img src="/assets/svgs/discard-trash-ic.svg" alt="Trash icon" class="icon">
+                    Discard
+                </button>
+                <button type="button" class="btn transparent-btn fill" *ngIf="!isLoading" (click)="onDataConnectorSave()">
+                    <img src="/assets/svgs/save-ic-white.svg" alt="Save icon" class="icon">
+                    Save
+                </button>
+                <div *ngIf="isLoading">
+                    <img src="/assets/img/loader.gif" class="w24">
+                    Processing your request
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="type-editor-content new-attribute-types">
+        <div class="row">
+            <div class="col-12 col-md-6 options-col">
+                <div class="options-wrap transparent-bg">
+                    <form [formGroup]="form" autocomplete="disabled">
+                        <div class="header">
+                            <div class="row field-row">
+                                <div class="col-md-12 type-name mb-3">
+                                    <div class="form-group">
+                                        <label for="name">Name</label>
+                                        <input type="text" class="form-control" id="name" formControlName="name">
+                                    </div>
+                                    <span class="position-absolute red mb-2" *ngIf="hasFormSubmitted && !form.controls.first_name.valid">Required</span>
+                                </div>
+                                <div class="col-md-12 type-name mb-3">
+                                    <div class="form-group">
+                                        <label for="client_id">Client ID</label>
+                                        <input type="text" class="form-control" id="client_id" formControlName="client_id">
+                                    </div>
+                                    <span class="position-absolute red mb-2" *ngIf="hasFormSubmitted && !form.controls.client_id.valid">Required</span>
+                                </div>
+                                <div class="col-md-12 type-name mb-3">
+                                    <div class="form-group">
+                                        <label for="client_secret">Client Secret</label>
+                                        <input type="email" class="form-control" id="client_secret" formControlName="client_secret">
+                                    </div>
+                                    <span class="position-absolute red mb-2" *ngIf="hasFormSubmitted && !form.controls.client_secret.valid">Required</span>
+                                </div>
+                                <div class="col-md-12 mb-3 bg-none">
+                                    <table class="table table-borderless">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>Read</th>
+                                                <th>Write</th>
+                                                <th>Admin</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="vertical-align-middle">Objects</td>
+                                                <td>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="radio" formControlName="object_permission" value="read" class="custom-control-input" id="object_read">
+                                                        <label class="custom-control-label" for="object_read"></label>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="radio" formControlName="object_permission" value="write" class="custom-control-input" id="object_write">
+                                                        <label class="custom-control-label" for="object_write"></label>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="radio" formControlName="object_permission" value="admin" class="custom-control-input" id="object_admin">
+                                                        <label class="custom-control-label" for="object_admin"></label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="vertical-align-middle">Relationships</td>
+                                                <td>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="radio" formControlName="relationship_permission" value="read" class="custom-control-input" id="relationship_read">
+                                                        <label class="custom-control-label" for="relationship_read"></label>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="radio" formControlName="relationship_permission" value="write" class="custom-control-input" id="relationship_write">
+                                                        <label class="custom-control-label" for="relationship_write"></label>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="radio" formControlName="relationship_permission" value="admin" class="custom-control-input" id="relationship_admin">
+                                                        <label class="custom-control-label" for="relationship_admin"></label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="vertical-align-middle">Attributes</td>
+                                                <td>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="radio" formControlName="attribute_permission" value="read" class="custom-control-input" id="attribute_read">
+                                                        <label class="custom-control-label" for="attribute_read"></label>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="radio" formControlName="attribute_permission" value="write" class="custom-control-input" id="attribute_write">
+                                                        <label class="custom-control-label" for="attribute_write"></label>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="radio" formControlName="attribute_permission" value="admin" class="custom-control-input" id="attribute_admin">
+                                                        <label class="custom-control-label" for="attribute_admin"></label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="vertical-align-middle">Models</td>
+                                                <td>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="radio" formControlName="model_permission" value="read" class="custom-control-input" id="model_read">
+                                                        <label class="custom-control-label" for="model_read"></label>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="radio" formControlName="model_permission" value="write" class="custom-control-input" id="model_write">
+                                                        <label class="custom-control-label" for="model_write"></label>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="radio" formControlName="model_permission" value="admin" class="custom-control-input" id="model_admin">
+                                                        <label class="custom-control-label" for="model_admin"></label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

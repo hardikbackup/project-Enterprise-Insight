@@ -1,0 +1,588 @@
+<ng-container *ngIf="viewMode == 'tree-view'">
+  <li
+    class="list-item drag_item drag_item_{{ item.type }} model-drag-item"
+    [id]="item.id"
+    cdkDrag
+    [cdkDragData]="item.id"
+    (cdkDragMoved)="dragMoved($event, item, parentId)"
+    *ngFor="let item of items"
+    [ngClass]="{
+      'dropdown show options-dropdown-expanded': item.expand,
+      'open-models-popup': modalPopup
+    }"
+    (customOpenDirectory)="onOpenModelDirectory(item)"
+    (contextmenu)="onModelOptions($event, item, true)"
+  >
+    <div class="folder-item-info d-flex row align-items-center">
+      <div class="col-auto data-call d-flex align-items-center">
+        <div class="check-wrap">
+          <ng-container
+            *ngIf="
+              showFolderCheckboxes ||
+              (!showFolderCheckboxes && item.type == 'model')
+            "
+          >
+            <input
+              type="checkbox"
+              [id]="'item_' + item.id"
+              [checked]="item.checked"
+              (change)="onCheckModelTreeItem($event, item)"
+              [name]="'item_' + item.id"
+            />
+            <label [for]="'item_' + item.id"></label>
+          </ng-container>
+        </div>
+        <div
+          class="arrow-icon"
+          (click)="onOpenModelDirectory(item)"
+          *ngIf="
+            item.type == 'folder' ||
+            (allowExpandModels && item.type != 'diagram' && item.type != 'view')
+          "
+        >
+          <span>
+            <img
+              src="/assets/svgs/right-arrow-expand.svg"
+              class="static-icon"
+              *ngIf="!item.expand"
+            />
+            <img src="/assets/svgs/arrow-down-active.svg" *ngIf="item.expand" />
+          </span>
+        </div>
+        <div
+          class="title-holder d-flex align-items-center"
+          *ngIf="
+            item.type == 'folder' ||
+            (publicationModelTree &&
+              ['object', 'diagram', 'view'].indexOf(item.type) != -1)
+          "
+        >
+          <span (click)="onOpenModelDirectory(item)">
+            <ng-container *ngIf="item.type == 'folder'">
+              <img src="/assets/svgs/folder-ic.svg" class="static-icon" />
+              <img src="/assets/svgs/folder-ic-red.svg" class="dark-active" />
+            </ng-container>
+            <ng-container *ngIf="item.type == 'object'">
+              <img
+                src="/assets/svgs/object-types-layers-ic-small.svg"
+                class="static-icon"
+              />
+              <img
+                src="/assets/svgs/object-types-layers-ic-small-red.svg"
+                class="dark-active"
+              />
+            </ng-container>
+            <ng-container *ngIf="item.type == 'diagram'">
+              <img
+                src="/assets/svgs/diagram-icon-small.svg"
+                class="static-icon"
+              />
+              <img
+                src="/assets/svgs/diagram-icon-small-red.svg"
+                class="dark-active"
+              />
+            </ng-container>
+            <ng-container *ngIf="item.type == 'view'">
+              <img
+                src="/assets/svgs/metamodel-ic-dark.svg"
+                class="static-icon"
+              />
+              <img
+                src="/assets/svgs/metamodel-ic-red.svg"
+                class="dark-active"
+              />
+            </ng-container>
+          </span>
+          <ng-container *ngIf="renameModelData.id !== item.id">
+            <dfn (click)="onOpenModelDirectory(item)">{{ item.name }}</dfn>
+          </ng-container>
+          <div class="form-group w-100" *ngIf="renameModelData.id == item.id">
+            <input
+              type="text"
+              class="form-control"
+              [value]="item.name"
+              (keyup)="onRenameKeyup($event, item)"
+            />
+          </div>
+        </div>
+        <div
+          class="title-holder d-flex align-items-center model-title"
+          *ngIf="item.type == 'model'"
+          [ngClass]="{ 'ml-30': !allowExpandModels }"
+        >
+          <span (click)="onOpenModelItem(item)">
+            <img
+              src="/assets/svgs/model-box-ic.svg"
+              alt="Model box icon"
+              class="static-icon"
+            />
+            <img
+              src="/assets/svgs/model-box-ic-red.svg"
+              alt="Model box icon"
+              class="dark-active"
+            />
+          </span>
+          <ng-container *ngIf="renameModelData.id !== item.id">
+            <dfn (click)="onOpenModelItem(item)">{{ item.name }}</dfn>
+          </ng-container>
+          <div class="form-group w-100" *ngIf="renameModelData.id == item.id">
+            <input
+              type="text"
+              class="form-control rename-input"
+              [id]="'rename_' + item.id"
+              [value]="item.name"
+              (keyup)="onRenameKeyup($event, item)"
+            />
+            <button class="close btn" (click)="onCancelRename()"></button>
+            <button class="save btn" (click)="onPreSaveRename(item)"></button>
+          </div>
+        </div>
+      </div>
+      <ng-container *ngIf="showSystemFields">
+        <div class="col-auto" (click)="onRowItemCheck(item)">
+          <cite class="create-date">
+            {{ item.created_on }}
+          </cite>
+        </div>
+        <div class="col-auto" (click)="onRowItemCheck(item)">
+          <cite class="update-date">
+            {{ item.updated_on }}
+          </cite>
+        </div>
+        <div class="col-auto" (click)="onRowItemCheck(item)">
+          <cite class="author">
+            {{ item.created_by }}
+          </cite>
+        </div>
+        <div class="col-auto" (click)="onRowItemCheck(item)">
+          <cite class="author">
+            {{ item.last_updated_by }}
+          </cite>
+        </div>
+      </ng-container>
+      <div
+        class="col-auto action-call position-relative"
+        *ngIf="showActionMenu"
+      >
+        <div
+          class="action-hold d-flex align-items-center"
+          [ngClass]="{
+            'options-shown':
+              modelExpandOptions.id == item.id &&
+              modelExpandOptions.type == 'fixed'
+          }"
+        >
+          <button
+            class="more-btn action-btn"
+            [ngClass]="{ active: modelExpandOptions.id == item.id }"
+            (click)="onModelOptions($event, item, false)"
+          >
+            <img src="/assets/svgs/more-vertical-ic-2.svg" alt="More icon" />
+          </button>
+          <div class="dropdown-wrap">
+            <div class="dropdown-info rightMenuHeight">
+              <ng-container *ngIf="item.type == 'folder'">
+                <button (click)="addFolderModel('folder', item)">
+                  Add Folder
+                </button>
+                <button (click)="addFolderModel('model', item)">
+                  Add Model
+                </button>
+              </ng-container>
+              <button (click)="onRenameModel(item)">Rename</button>
+              <button (click)="onCopyModelFolder(item)">Copy</button>
+              <button
+                (click)="onPasteModelFolder(item)"
+                *ngIf="
+                  modelFolderCopyOptions.id &&
+                  modelFolderCopyOptions.id !== item.id &&
+                  item.type == 'folder'
+                "
+              >
+                Paste
+              </button>
+              <ng-container *ngIf="item.type == 'model'">
+                <button (click)="onEditMetamodels(item)">Metamodels</button>
+                <ng-container *ngIf="admin">
+                  <button (click)="onOpenPermissionsModal(item)">
+                    Permissions
+                  </button>
+                </ng-container>
+                <button (click)="onHandleFavorite(item)">
+                  {{
+                    item.is_favorite ? "Remove Favorite" : "Add To Favorites"
+                  }}
+                </button>
+                <button (click)="onOrganizeModel(item.id)">
+                  Run organization
+                </button>
+              </ng-container>
+              <button (click)="onDeleteModelFolderItem(item)">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="col-auto action-call position-relative"
+        style="{{
+          modelExpandOptions.id == item.id && modelExpandOptions.type == 'float'
+            ? 'right:' + modelExpandOptions.right + 'px;'
+            : 'display:none;'
+        }}"
+        *ngIf="showActionMenu"
+      >
+        <div
+          class="action-hold d-flex align-items-center"
+          [ngClass]="{
+            'options-shown float-menu-no-box':
+              modelExpandOptions.id == item.id &&
+              modelExpandOptions.type == 'float'
+          }"
+        >
+          <div class="dropdown-wrap top-n-13">
+            <div class="dropdown-info rightMenuHeight">
+              <ng-container *ngIf="item.type == 'folder'">
+                <button (click)="addFolderModel('folder', item)">
+                  Add Folder
+                </button>
+                <button (click)="addFolderModel('model', item)">
+                  Add Model
+                </button>
+              </ng-container>
+              <button (click)="onRenameModel(item)">Rename</button>
+              <button (click)="onCopyModelFolder(item)">Copy</button>
+              <button
+                (click)="onPasteModelFolder(item)"
+                *ngIf="
+                  modelFolderCopyOptions.id &&
+                  modelFolderCopyOptions.id !== item.id &&
+                  item.type == 'folder'
+                "
+              >
+                Paste
+              </button>
+              <ng-container *ngIf="item.type == 'model'">
+                <button (click)="onEditMetamodels(item)">Metamodels</button>
+                <ng-container *ngIf="admin">
+                  <button (click)="onOpenPermissionsModal(item)">
+                    Permissions
+                  </button>
+                </ng-container>
+                <button (click)="onHandleFavorite(item)">
+                  {{
+                    item.is_favorite ? "Remove Favorite" : "Add To Favorites"
+                  }}
+                </button>
+                <button (click)="onOrganizeModel(item.id)">
+                  Run organization
+                </button>
+              </ng-container>
+              <button (click)="onDeleteModelFolderItem(item)">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ul
+      class="dropdown-menu"
+      [id]="'main_' + item.id"
+      *ngIf="(item.type == 'folder' || item.type == 'model') && item.expand"
+    >
+      <app-model-manager-tree
+        [viewMode]="viewMode"
+        [items]="item.items"
+        [level]="level + 1"
+        [parentId]="item.id"
+        [parentType]="item.type"
+        [parentPages]="item.pages"
+        [loggedInUser]="loggedInUser"
+        [modelFolderCopyOptions]="modelFolderCopyOptions"
+        [defaultSort]="defaultSort"
+        [showFolderCheckboxes]="showFolderCheckboxes"
+        [showActionMenu]="showActionMenu"
+        [showSystemFields]="showSystemFields"
+        [modelBrowserSocket]="modelBrowserSocket"
+        [allowExpandModels]="allowExpandModels"
+        [publicationModelTree]="publicationModelTree"
+        (parentUncheckEvent)="onParentUncheck($event)"
+        [checkedModelItems]="checkedModelItems"
+        [publicationId]="publicationId"
+        [publicationView]="publicationView"
+        [modalPopup]="modalPopup"
+      >
+      </app-model-manager-tree>
+    </ul>
+  </li>
+</ng-container>
+<div *ngIf="currentPage < parentPages" class="text-center">
+  <a
+    class="btn transparent-btn small"
+    (click)="loadModelItems(currentPage + 1)"
+  >
+    <dfn class="d-none d-md-inline-block">Load More</dfn>
+  </a>
+</div>
+<ng-template #updateFolderModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">
+      {{ updateFolderModelObj.type == "model" ? "Edit Model" : "Edit Folder" }}
+    </h4>
+    <button
+      type="button"
+      class="close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('dismiss')"
+    >
+      <span aria-hidden="true">
+        <img src="/assets/svgs/modal-x-ic.svg" alt="X icon" />
+      </span>
+    </button>
+  </div>
+  <form [formGroup]="updateFolderModelForm" (ngSubmit)="onUpdateFolderModel()">
+    <div class="modal-body">
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-control"
+          formControlName="name"
+          placeholder="Folder Name"
+          required="required"
+        />
+        <span
+          class="red mb-2"
+          *ngIf="
+            hasFolderUpdateFormSubmitted &&
+            updateFolderModelForm.controls &&
+            !updateFolderModelForm.controls.name.valid
+          "
+          >Required</span
+        >
+      </div>
+    </div>
+    <div class="text-center mb-4 mt-4" *ngIf="showUpdateFolderModelLoading">
+      <img src="/assets/img/loader.gif" class="w24" />
+      Processing your request
+    </div>
+    <div
+      class="modal-footer justify-content-center"
+      *ngIf="!showUpdateFolderModelLoading"
+    >
+      <button
+        type="button"
+        class="btn transparent-btn"
+        data-dismiss="modal"
+        (click)="modal.dismiss('dismiss')"
+      >
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-red">Save</button>
+    </div>
+  </form>
+</ng-template>
+<ng-template #confirmDeleteItemModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">Confirmation Required</h4>
+    <button
+      type="button"
+      class="close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('dismiss')"
+    >
+      <span aria-hidden="true">
+        <img src="/assets/svgs/modal-x-ic.svg" alt="X icon" />
+      </span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      Are you sure you want to delete
+      <span class="text-bold text-dark">"{{ deleteItem.name }}"</span>?
+    </div>
+  </div>
+  <div class="modal-footer justify-content-center">
+    <div class="row row-cols-1 row-cols-sm-2 no-gutters m-0">
+      <div class="col pr-sm-2">
+        <button
+          type="button"
+          class="btn transparent-btn w-100"
+          data-dismiss="modal"
+          (click)="modal.dismiss('dismiss')"
+        >
+          No
+        </button>
+      </div>
+      <div class="col pl-sm-2">
+        <button
+          type="button"
+          class="btn btn-red w-100"
+          (click)="onConfirmDeleteItem()"
+        >
+          Yes
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #editMetamodelsModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">Edit Metamodels</h4>
+    <button
+      type="button"
+      class="close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('dismiss')"
+    >
+      <span aria-hidden="true">
+        <img src="/assets/svgs/modal-x-ic.svg" alt="X icon" />
+      </span>
+    </button>
+  </div>
+  <form [formGroup]="metamodelForm">
+    <div class="modal-body">
+      <div class="form-group select-wrapper">
+        <ng-select
+          class="ng-dropdown"
+          formControlName="metamodel_id"
+          [items]="availableMetamodels"
+          [searchable]="true"
+          [clearable]="false"
+          [placeholder]="'Select'"
+          [multiple]="true"
+          bindLabel="name"
+          bindValue="metamodel_id"
+          (search)="onMetamodelSearch($event)"
+        ></ng-select>
+        <span
+          class="red mb-2"
+          *ngIf="
+            hasMetamodelFormSubmitted &&
+            !metamodelForm.controls.metamodel_id.valid
+          "
+          >Required</span
+        >
+      </div>
+    </div>
+    <div class="text-center mb-4 mt-4" *ngIf="showMetamodelLoading">
+      <img src="/assets/img/loader.gif" class="w24" />
+      Processing your request
+    </div>
+    <div
+      class="modal-footer justify-content-center"
+      *ngIf="!showMetamodelLoading"
+    >
+      <button
+        type="button"
+        class="btn transparent-btn"
+        data-dismiss="modal"
+        (click)="modal.dismiss('dismiss')"
+      >
+        Cancel
+      </button>
+      <button type="button" (click)="onMetamodelUpdate()" class="btn btn-red">
+        Update
+      </button>
+    </div>
+  </form>
+</ng-template>
+<ng-template #permissionsModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">
+      {{ selectedPermissionOptions.name }} Permissions
+    </h4>
+    <button
+      type="button"
+      class="close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="modal.dismiss('dismiss')"
+    >
+      <span aria-hidden="true">
+        <img src="/assets/svgs/modal-x-ic.svg" alt="X icon" />
+      </span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="permissions-container">
+      <table class="table table-striped table-borderless">
+        <thead class="headerSticky">
+          <tr>
+            <th>User Group</th>
+            <th>Read</th>
+            <th>Edit</th>
+            <th>No Access</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of permissions">
+            <td>{{ item.name }}</td>
+            <td>
+              <div class="form-wrap mt-2">
+                <div class="check-wrap label-text">
+                  <input
+                    type="checkbox"
+                    [name]="'read_' + item.id"
+                    [id]="'read_' + item.id"
+                    [checked]="item.can_read"
+                    (change)="onPermissionUpdate($event, item.id, 'read')"
+                  />
+                  <div class="checkbox"></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="form-wrap mt-2">
+                <div class="check-wrap label-text">
+                  <input
+                    type="checkbox"
+                    [name]="'edit_' + item.id"
+                    [id]="'edit_' + item.id"
+                    [checked]="item.can_edit"
+                    (change)="onPermissionUpdate($event, item.id, 'edit')"
+                  />
+                  <div class="checkbox"></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="form-wrap mt-2">
+                <div class="check-wrap label-text">
+                  <input
+                    type="checkbox"
+                    [name]="'no_access_' + item.id"
+                    [id]="'no_access_' + item.id"
+                    [checked]="item.no_access"
+                    (change)="onPermissionUpdate($event, item.id, 'no_access')"
+                  />
+                  <div class="checkbox"></div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-footer justify-content-center">
+      <a
+        class="btn transparent-btn small"
+        *ngIf="permissionsCurrentPage < permissionsMaxPage"
+        (click)="loadMorePermissions(this.permissionsCurrentPage + 1)"
+      >
+        <dfn class="d-none d-md-inline-block">Load More</dfn>
+      </a>
+    </div>
+  </div>
+</ng-template>
+<ng-template #organizeProcessingModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title text-center">Organizing {{ organizeModel.name }}</h4>
+  </div>
+  <div class="modal-body text-center mb-2">
+    <span class="mb-2">
+      <img src="/assets/img/loader.gif" class="w18" />
+      Processing...
+    </span>
+  </div>
+</ng-template>

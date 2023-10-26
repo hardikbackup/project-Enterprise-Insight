@@ -1,0 +1,558 @@
+<app-master-layout></app-master-layout>
+<div class="content-wrapper types-editor">
+    <div class="content-wrapper__data-title">
+        <div class="row data-highlight d-flex align-items-center m-0">
+            <div class="title-holder col-lg-auto col-12 col-sm-6 d-flex align-items-center p-0">
+                <a class="btn back-btn" routerLink="/dashboard">
+                    <img class="default-icon" src="/assets/svgs/arrow-left-ic.svg" alt="Left arrow">
+                    <img class="hover-icon" src="/assets/svgs/arrow-left-ic-red.svg" alt="Left arrow red">
+                </a>
+                <h3>Settings</h3>
+            </div>
+            <div
+                class="btn-wrapper action-triger-wrap transparent-btn btn__inline d-flex align-items-center col-lg-auto col-12 col-sm-6 col-md-12 mt-3 mt-sm-0 mt-md-4 mt-lg-0 p-0 ml-sm-auto">
+                <button type="button" class="btn ml-sm-auto ml-md-0 ml-lg-auto transparent-btn" routerLink="/dashboard"
+                    *ngIf="!isLoading">
+                    <img src="/assets/svgs/discard-trash-ic.svg" alt="Trash icon" class="icon">
+                    Discard
+                </button>
+                <button type="button" class="btn transparent-btn fill" *ngIf="!isLoading" (click)="onSettingsUpdate()">
+                    <img src="/assets/svgs/save-ic-white.svg" alt="Save icon" class="icon">
+                    Save
+                </button>
+                <div *ngIf="isLoading">
+                    <img src="/assets/img/loader.gif" class="w24">
+                    Processing your request
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="type-editor-content new-attribute-types">
+        <div class="row" *ngIf="isAdminSettings">
+            <div class="col-12">
+                <div class="item-nav">
+                    <a class="cursor-pointer" [ngClass]="{'active' : currentActiveTab == 'settings'}"
+                        (click)="onTabChange('settings')">My Settings</a>
+                    <a class="cursor-pointer" [ngClass]="{'active' : currentActiveTab == 'global'}"
+                        (click)="onTabChange('global')">Global Settings</a>
+                    <a class="cursor-pointer" [ngClass]="{'active' : currentActiveTab == 'publications_settings'}"
+                        (click)="onTabChange('publications_settings')">Publication Settings</a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 options-col" [ngClass]="{' col-md-6':currentActiveTab != 'global'}">
+                <div class="options-wrap transparent-bg">
+                    <form [formGroup]="settingsForm" *ngIf="settingsForm">
+                        <ng-container *ngIf="currentActiveTab == 'settings'">
+                            <div class="header">
+                                <section>
+                                    <div class="mb-3">Diagramming Behavior</div>
+                                    <div class="row field-row">
+                                        <div class="col-5 ml-1 ">
+                                            <div class="mt-10">
+                                                <label for="user_diagram_new_tab">Open diagram in new tab</label>
+                                                <div class="custom-control custom-switch">
+                                                    <input type="checkbox" class="custom-control-input"
+                                                        id="user_diagram_new_tab"
+                                                        formControlName="user_diagram_new_tab">
+                                                    <label class="custom-control-label"
+                                                        for="user_diagram_new_tab"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-5 ml-2">
+                                            <div class="mt-10">
+                                                <label for="user_prompt_diagram_object_delete">Prompt deletion of
+                                                    objects /
+                                                    relationships removed from diagram</label>
+                                                <div class="custom-control custom-switch">
+                                                    <input type="checkbox" class="custom-control-input"
+                                                        id="user_prompt_diagram_object_delete"
+                                                        formControlName="user_prompt_diagram_object_delete">
+                                                    <label class="custom-control-label"
+                                                        for="user_prompt_diagram_object_delete"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-5 ml-1">
+                                            <div class="mt-10">
+                                                <label for="user_prompt_diagram_reuse_objects">Prompt reuse of
+                                                    objects</label>
+                                                <div class="custom-control custom-switch">
+                                                    <input type="checkbox" class="custom-control-input"
+                                                        id="user_prompt_diagram_reuse_objects"
+                                                        formControlName="user_prompt_diagram_reuse_objects">
+                                                    <label class="custom-control-label"
+                                                        for="user_prompt_diagram_reuse_objects"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-5 ml-2 mt-2">
+                                            <div class="mt-10">
+                                                <label for="user_prompt_diagram_reuse_relationships">Prompt reuse of relationships</label>
+                                            <div class="custom-control custom-switch">
+                                               <label for="user_prompt_diagram_reuse_relationships"></label>
+                                                <input type="checkbox" class="custom-control-input" id="user_prompt_diagram_reuse_relationships" formControlName="user_prompt_diagram_reuse_relationships">
+                                                 <label for="user_prompt_diagram_reuse_relationships" class="custom-control-label"></label>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="mb-3 mt-4">Modeling Behavior</div>
+                                    <div class="row field-row mt-3">
+                                        <div class="col-auto select-wrap w-100">
+                                            <div class="form-group">
+                                                <label for="user_model_viewer_pages">Model Viewer Items Per Page</label>
+                                                <input type="text" class="form-control"
+                                                    formControlName="user_model_viewer_pages"
+                                                    id="user_model_viewer_pages">
+                                                <span class="position-absolute red mb-2"
+                                                    *ngIf="hasFormSubmitted && !settingsForm.controls.user_model_viewer_pages.valid">Please
+                                                    specify valid number</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <div class="row field-row mt-3">
+                                        <div class="col-auto select-wrap w-100">
+                                            <div class="form-group">
+                                                <label for="user_model_tree_viewer_pages">Model Viewer Tree Items Per
+                                                    Page</label>
+                                                <input type="text" class="form-control"
+                                                    formControlName="user_model_tree_viewer_pages"
+                                                    id="user_model_tree_viewer_pages">
+                                                <span class="position-absolute red mb-2"
+                                                    *ngIf="hasFormSubmitted && !settingsForm.controls.user_model_tree_viewer_pages.valid">Please
+                                                    specify valid number</span>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                    <hr>
+                                    <div class="mb-3 mt-4">Exit Behavior</div>
+                                    <div class="row field-row mt-3">
+                                        <ul class="list-unstyled p-1">
+                                            <li>
+                                                <div class="form-wrap mb-3">
+                                                    <div class="check-wrap radio-item label-text">
+                                                        <input type="radio" formControlName="user_exit_behavior"
+                                                            name="user_exit_behavior" id="user_exit_close_tab"
+                                                            value="exit_tab">
+                                                        <label class="text-muted fs-12" for="user_exit_close_tab">
+                                                            Exit and close tab if another tab is open
+                                                        </label>
+                                                        <div class="checkbox"></div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="form-wrap">
+                                                    <div class="check-wrap radio-item label-text">
+                                                        <input type="radio" formControlName="user_exit_behavior"
+                                                            name="user_exit_behavior" id="user_exit_model_browse"
+                                                            value="exit_to_model">
+                                                        <label class="text-muted fs-12" for="user_exit_model_browse">
+                                                            Exit to model browser
+                                                        </label>
+                                                        <div class="checkbox"></div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </section>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="currentActiveTab == 'global'">
+                            <div class="d-md-flex gap-8px">
+                                <div class="header h-100">
+                                    <section *ngIf="isAdminSettings">
+                                        <div>
+                                            <div class="mb-4">Regionalization</div>
+                                            <div class="row field-row">
+                                                <div class="col-auto select-wrap">
+                                                    <div class="form-group">
+                                                        <label for="global_date_format1">Date Format</label>
+                                                        <select class="form-control" id="global_date_format1"
+                                                            formControlName="global_date_format1">
+                                                            <option *ngFor="let item of dateFormatOptions | keyvalue"
+                                                                [value]="item.key">
+                                                                {{ item.value }}
+                                                            </option>
+                                                        </select>
+                                                        <span class="position-absolute red mb-2"
+                                                            *ngIf="hasFormSubmitted && !settingsForm.controls.global_date_format1.valid">Required</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto select-wrap">
+                                                    <div class="form-group">
+                                                        <label for="global_date_format2">Date Format</label>
+                                                        <select class="form-control" id="global_date_format2"
+                                                            formControlName="global_date_format2">
+                                                            <option *ngFor="let item of dateFormatOptions | keyvalue"
+                                                                [value]="item.key">
+                                                                {{ item.value }}
+                                                            </option>
+                                                        </select>
+                                                        <span class="position-absolute red mb-2"
+                                                            *ngIf="hasFormSubmitted && !settingsForm.controls.global_date_format2.valid">Required</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto select-wrap">
+                                                    <div class="form-group">
+                                                        <label for="global_date_format3">Date Format</label>
+                                                        <select class="form-control" id="global_date_format3"
+                                                            formControlName="global_date_format3">
+                                                            <option *ngFor="let item of dateFormatOptions | keyvalue"
+                                                                [value]="item.key">
+                                                                {{ item.value }}
+                                                            </option>
+                                                        </select>
+                                                        <span class="position-absolute red mb-2"
+                                                            *ngIf="hasFormSubmitted && !settingsForm.controls.global_date_format3.valid">Required</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto select-wrap">
+                                                    <div class="form-group mt-10">
+                                                        <label for="global_date_separator">Separator</label>
+                                                        <select class="form-control" id="global_date_separator"
+                                                            formControlName="global_date_separator">
+                                                            <option *ngFor="let item of dateSeparatorOptions | keyvalue"
+                                                                [value]="item.key">
+                                                                {{ item.value }}
+                                                            </option>
+                                                        </select>
+                                                        <span class="position-absolute red mb-2"
+                                                            *ngIf="hasFormSubmitted && !settingsForm.controls.global_date_separator.valid">Required</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto select-wrap">
+                                                    <div class="form-group mt-10">
+                                                        <label for="global_region">Region</label>
+                                                        <select class="form-control" id="global_region"
+                                                            formControlName="global_region">
+                                                            <option *ngFor="let item of regions | keyvalue"
+                                                                [value]="item.value.code">
+                                                                {{ item.value.name }}
+                                                            </option>
+                                                        </select>
+                                                        <span class="position-absolute red mb-2"
+                                                            *ngIf="hasFormSubmitted && !settingsForm.controls.global_region.valid">Required</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto select-wrap">
+                                                    <div class="form-group">
+                                                        <label for="global_date_format1">Currency</label>
+                                                        <select class="form-control" id="global_currency"
+                                                            formControlName="global_currency">
+                                                            <option *ngFor="let item of currencyOptions | keyvalue"
+                                                                [value]="item.key">
+                                                                {{ item.value }}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="mb-3">Default Diagramming Behavior</div>
+                                            <div class="row field-row">
+                                                <div class="col-auto select-wrap">
+                                                    <div class="mt-10">
+                                                        <label for="global_diagram_new_tab">Open diagram in new
+                                                            tab</label>
+                                                        <div class="custom-control custom-switch">
+                                                            <input type="checkbox" class="custom-control-input"
+                                                                id="global_diagram_new_tab"
+                                                                formControlName="global_diagram_new_tab">
+                                                            <label class="custom-control-label"
+                                                                for="global_diagram_new_tab"></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto select-wrap">
+                                                    <div class="mt-10">
+                                                        <label for="global_prompt_diagram_object_delete">Prompt deletion
+                                                            of
+                                                            objects / relationships removed from diagram</label>
+                                                        <div class="custom-control custom-switch">
+                                                            <input type="checkbox" class="custom-control-input"
+                                                                id="global_prompt_diagram_object_delete"
+                                                                formControlName="global_prompt_diagram_object_delete">
+                                                            <label class="custom-control-label"
+                                                                for="global_prompt_diagram_object_delete"></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto select-wrap">
+                                                    <div class="mt-10">
+                                                        <label for="global_prompt_diagram_reuse_objects">Prompt reuse of
+                                                            objects</label>
+                                                        <div class="custom-control custom-switch">
+                                                            <input type="checkbox" class="custom-control-input"
+                                                                id="global_prompt_diagram_reuse_objects"
+                                                                formControlName="global_prompt_diagram_reuse_objects">
+                                                            <label class="custom-control-label"
+                                                                for="global_prompt_diagram_reuse_objects"></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3 mt-4">Default Modeling Behavior</div>
+                                            <div class="row field-row mt-3">
+                                                <div class="col-auto select-wrap w-100">
+                                                    <div class="form-group">
+                                                        <label for="global_model_viewer_pages">Model Viewer Items Per
+                                                            Page</label>
+                                                        <input type="text" class="form-control"
+                                                            formControlName="global_model_viewer_pages"
+                                                            id="global_model_viewer_pages">
+                                                        <span class="position-absolute red mb-2"
+                                                            *ngIf="hasFormSubmitted && !settingsForm.controls.global_model_viewer_pages.valid">Please
+                                                            specify valid number</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="mb-3 mt-4">Default Exit Behavior</div>
+                                            <div class="row field-row mt-3">
+                                                <ul class="list-unstyled p-1">
+                                                    <li>
+                                                        <div class="form-wrap mb-3">
+                                                            <div class="check-wrap radio-item label-text">
+                                                                <input type="radio"
+                                                                    formControlName="global_exit_behavior"
+                                                                    name="global_exit_behavior"
+                                                                    id="global_exit_close_tab" value="exit_tab">
+                                                                <label class="text-muted fs-12"
+                                                                    for="global_exit_close_tab">
+                                                                    Exit and close tab if another tab is open
+                                                                </label>
+                                                                <div class="checkbox"></div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="form-wrap">
+                                                            <div class="check-wrap radio-item label-text">
+                                                                <input type="radio"
+                                                                    formControlName="global_exit_behavior"
+                                                                    name="global_exit_behavior"
+                                                                    id="global_exit_model_browse" value="exit_to_model">
+                                                                <label class="text-muted fs-12"
+                                                                    for="global_exit_model_browse">
+                                                                    Exit to model browser
+                                                                </label>
+                                                                <div class="checkbox"></div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                                <div class="header h-100">
+                                    <section *ngIf="isAdminSettings">
+                                        <div>
+                                            <!-- default session time out settings -->
+                                            <!-- <hr> -->
+                                            <div class="mb-3">Default Session Timeout Settings</div>
+                                            <div class="row field-row mt-3" style="margin-bottom: 30px;">
+                                                <div class="col-3 select-wrap w-100 mr-1">
+                                                    <div class="form-group">
+                                                        <label for="user_model_viewer_pages">Access Token Validity (in
+                                                            hrs)</label>
+                                                        <input type="text" class="form-control"
+                                                            formControlName="access_token_validity"
+                                                            id="access_token_validity">
+                                                        <span class="position-absolute red" style="margin-top: 18px;"
+                                                            *ngIf="hasFormSubmitted && !settingsForm.controls.access_token_validity.valid">Please
+                                                            enter hrs between
+                                                            1-24 </span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-3">
+                                                    <div class="form-group">
+                                                        <label for="user_model_viewer_pages">Refresh Token Validity (in
+                                                            days)</label>
+                                                        <input type="text" class="form-control"
+                                                            formControlName="refresh_token_validity"
+                                                            id="refresh_token_validity">
+                                                        <span class="position-absolute red" style="margin-top: 18px;"
+                                                            *ngIf="hasFormSubmitted && !settingsForm.controls.refresh_token_validity.valid">Please
+                                                            enter days
+                                                            between 1-30</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <hr>
+                                            <div class="mb-3 mt-4">Password Complexity Settings</div>
+                                            <div class="form-wrap  mb-2">
+                                                <div class="check-wrap  label-text">
+                                                    <input type="checkbox" formControlName="required_capital_letter"
+                                                        name="required_capital_letter" id="required_capital_letter">
+                                                    <label class="text-muted fs-12" for="required_capital_letter">
+                                                        Must include capital letter(s)
+                                                    </label>
+                                                    <div class="checkbox"></div>
+                                                </div>
+                                            </div>
+                                            <div class="form-wrap mb-2">
+                                                <div class="check-wrap  label-text">
+                                                    <input type="checkbox" formControlName="required_special_character"
+                                                        name="required_special_character"
+                                                        id="required_special_character">
+                                                    <label class="text-muted fs-12" for="required_special_character">
+                                                        Must include special character
+                                                    </label>
+                                                    <div class="checkbox"></div>
+                                                </div>
+                                            </div>
+                                            <div class="form-wrap  mb-2">
+                                                <div class="check-wrap  label-text">
+                                                    <input type="checkbox" formControlName="required_number"
+                                                        name="required_number" id="required_number">
+                                                    <label class="text-muted fs-12" for="required_number">
+                                                        Must include number(s)
+                                                    </label>
+                                                    <div class="checkbox"></div>
+                                                </div>
+                                            </div>
+                                            <div class="form-wrap  mb-2">
+                                                <div class="check-wrap  label-text">
+                                                    <input type="checkbox" formControlName="required_minimum_length"
+                                                        name="required_minimum_length" id="required_minimum_length">
+                                                    <label class="text-muted fs-12" for="required_minimum_length">
+                                                        Must have minimum length of characters
+                                                    </label>
+                                                    <div class="checkbox"></div>
+                                                </div>
+                                            </div>
+                                            <div class="row field-row mt-3">
+                                                <div class="col-3 select-wrap w-100 mr-1">
+                                                    <div class="form-group">
+                                                        <label for="user_model_viewer_pages">No of characters in
+                                                            password</label>
+                                                        <input type="number" class="form-control"
+                                                            formControlName="password_length">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf=" currentActiveTab == 'publications_settings'">
+                            <div class="header">
+                                <section>
+                                    <div class="mb-3">Publications Heatmap color codes</div>
+                                    <div class="row field-row mb-2">
+                                        <div class="col-6 mt-2 mt-md-2">
+                                            <div class="form-group shape-color body-bg">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <span class="label"> Select Heatmap color-1 </span>
+                                                        <label type="text" class="d-block w-100 color-picker-label"
+                                                            [(colorPicker)]="heatmapColor1" [cpOutputFormat]="'hex'"
+                                                            [cpPosition]="'bottom'" [(cpToggle)]="isShowHeatmapColor1"
+                                                            [cpPresetColors]="presetColors">
+                                                            {{ heatmapColor1 }}
+                                                        </label>
+                                                    </div>
+                                                    <span class="color-controller" [style.background]="heatmapColor1"
+                                                        (click)="onShowColorPicker('heatmap_color1')"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row field-row mb-2">
+                                        <div class="col-6 mt-2 mt-md-2">
+                                            <div class="form-group shape-color body-bg">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <span class="label"> Select Heatmap color-2 </span>
+                                                        <label type="text" class="d-block w-100 color-picker-label"
+                                                            [(colorPicker)]="heatmapColor2" [cpOutputFormat]="'hex'"
+                                                            [cpPosition]="'bottom'" [(cpToggle)]="isShowHeatmapColor2"
+                                                            [cpPresetColors]="presetColors">
+                                                            {{ heatmapColor2 }}
+                                                        </label>
+                                                    </div>
+                                                    <span class="color-controller" [style.background]="heatmapColor2"
+                                                        (click)="onShowColorPicker('heatmap_color2')"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row field-row mb-2">
+                                        <div class="col-6 mt-2 mt-md-2">
+                                            <div class="form-group shape-color body-bg">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <span class="label"> Select Heatmap color-3 </span>
+                                                        <label type="text" class="d-block w-100 color-picker-label"
+                                                            [(colorPicker)]="heatmapColor3" [cpOutputFormat]="'hex'"
+                                                            [cpPosition]="'bottom'" [(cpToggle)]="isShowHeatmapColor3"
+                                                            [cpPresetColors]="presetColors">
+                                                            {{ heatmapColor3 }}
+                                                        </label>
+                                                    </div>
+                                                    <span class="color-controller" [style.background]="heatmapColor3"
+                                                        (click)="onShowColorPicker('heatmap_color3')"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row field-row mb-2">
+                                        <div class="col-6 mt-2 mt-md-2">
+                                            <div class="form-group shape-color body-bg">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <span class="label"> Select Heatmap color-4 </span>
+                                                        <label type="text" class="d-block w-100 color-picker-label"
+                                                            [(colorPicker)]="heatmapColor4" [cpOutputFormat]="'hex'"
+                                                            [cpPosition]="'bottom'" [(cpToggle)]="isShowHeatmapColor4"
+                                                            [cpPresetColors]="presetColors">
+                                                            {{ heatmapColor4 }}
+                                                        </label>
+                                                    </div>
+                                                    <span class="color-controller" [style.background]="heatmapColor4"
+                                                        (click)="onShowColorPicker('heatmap_color4')"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row field-row mb-2">
+                                        <div class="col-6 mt-2 mt-md-2">
+                                            <div class="form-group shape-color body-bg">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <span class="label"> Select Heatmap color-5 </span>
+                                                        <label type="text" class="d-block w-100 color-picker-label"
+                                                            [(colorPicker)]="heatmapColor5" [cpOutputFormat]="'hex'"
+                                                            [cpPosition]="'bottom'" [(cpToggle)]="isShowHeatmapColor5"
+                                                            [cpPresetColors]="presetColors">
+                                                            {{ heatmapColor5 }}
+                                                        </label>
+                                                    </div>
+                                                    <span class="color-controller" [style.background]="heatmapColor5"
+                                                        (click)="onShowColorPicker('heatmap_color5')"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </ng-container>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

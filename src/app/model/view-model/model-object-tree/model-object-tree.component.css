@@ -1,0 +1,22 @@
+.drop-item-prev {
+  border: 1px solid red;
+  background-color: rgb(255, 255, 255);
+  border-radius: 4px;
+  width: 12rem;
+  padding-left: 1rem;
+}
+
+.obj-class {
+  width: 165px;
+  white-space: nowrap;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+}
+
+.load-more-btn {
+  cursor: pointer;
+}
+
+.rightMenuHeight {
+  height: 160px;
+}

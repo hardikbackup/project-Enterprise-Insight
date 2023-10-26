@@ -1,0 +1,335 @@
+<ng-container *ngIf="mode">
+    <ng-container *ngIf="mode == 'view'">
+        <app-header [stand_alone_header]="true" [show_environment]="false" [publications_viewer]="true"></app-header>
+    </ng-container>
+    <ng-container *ngIf="mode == 'manage'">
+        <app-master-layout></app-master-layout>
+    </ng-container>
+    <div class=" object-types-contents" [ngClass]="mode == 'view' ? 'ml-0' : 'content-wrapper'">
+        <div class="content-wrapper__data-title">
+            <div class="row data-highlight d-flex align-items-center m-0">
+                <div class="title-holder col-lg-auto col-6 d-flex align-items-center p-0">
+                <span>
+                    <img class="default-icon" src="/assets/svgs/file-text-ic.svg" alt="File text icon">
+                    <img class="hover-icon" src="/assets/svgs/file-text-ic-red.svg" alt="File text icon red">
+                </span>
+                    <h3>Publications</h3>
+                </div>
+                <div *ngIf="mode == 'manage'" class="btn-wrapper action-triger-wrap btn__inline col-lg-auto col-6 col-md-12 mt-sm-3 mt-md-4 mt-lg-0 d-flex justify-content-xl-end p-0 ml-auto">
+                    <a *ngIf="getTotalSelectedPublications()" (click)="onDeleteMultiplePublications()" class="btn transparent-btn medium ml-0">
+                    <span class="icon-wrap">
+                        <img class="default-icon" src="/assets/svgs/trash-ic.svg" alt="Trash icon">
+                        <img class="dark-active" src="/assets/svgs/trash-ic-white.svg" alt="Trash icon Red">
+                    </span>
+                        <dfn class="d-none d-md-block">
+                            Delete Selected ({{ getTotalSelectedPublications() }})
+                        </dfn>
+                    </a>
+                    <a routerLink="/publications/add" class="btn transparent-btn medium">
+                    <span class="icon-wrap">
+                        <img class="default-icon" src="/assets/svgs/plus-ic.svg" alt="Plus icon ">
+                        <img class="dark-active" src="/assets/svgs/plus-ic-white.svg" alt="Plus icon Red">
+                    </span>
+                        <span class="d-md-none icon-wrap">
+                        <img class="default-icon" src="/assets/svgs/object-type-layers-ic.svg" alt="folder icon ">
+                        <img class="dark-active" src="/assets/svgs/object-type-layers-ic-red.svg" alt="folder icon ">
+                    </span>
+                        <dfn class="d-none d-md-block">Create Publication</dfn>
+                    </a>
+                </div>
+            </div>
+            <div class="row m-0 data-trigger d-flex align-items-center">
+                <div class="col-md-8 col-sm-12 px-0 breadcrumb-info d-none d-md-block">
+                    <div class="breadcrumbs">
+                        <a routerlink="/publications">Publications</a>
+                        <a style="display: none;"  *ngFor="let item of publications" [routerLink]="embededView(item)">Embed URL</a>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-12 px-0 trigger-info d-none d-md-block">
+                    <div class="trigger d-flex align-items-center justify-content-end ">
+                        <!-- <button (click)="onTabChange('list')" type="button" [ngClass]="{'active': defaultListTab == 'list'}">
+                            <span class="list-icon icon">
+                                <img class="static-icon" src="/assets/svgs/list-ic.svg" alt="">
+                                <img class="hover-icon" src="/assets/svgs/list-ic-red.svg" alt="">
+                                <img class="dark-active" src="/assets/svgs/list-ic-white.svg" alt="">
+                            </span>
+                        </button> -->
+                        <!-- <button (click)="onTabChange('box')" type="button" [ngClass]="{'active': defaultListTab == 'box'}">
+                            <span class="icon-grid icon">
+                                <img class="static-icon" src="/assets/svgs/grid-ic.svg" alt="">
+                                <img class="hover-icon" src="/assets/svgs/grid-ic-red.svg" alt="">
+                                <img class="dark-active" src="/assets/svgs/grid-ic-white.svg" alt="">
+                            </span>
+                        </button> -->
+
+                    </div>
+                </div>
+                <div class="expand-info" [ngClass]="{'display-block': showPublicationDetails.show}">
+                    <div class="expand-inner">
+                        <div class="profile-info">
+                            <div class="title-holder folder-wrapper col-md-12 col-sm-12 d-flex align-items-center p-0">
+                                <span class="folder-icon">
+                                    <img src="/assets/svgs/file-text-ic.svg" alt="" class="static-icon">
+                                    <img src="/assets/svgs/file-text-ic-red.svg" alt="" class="hover-icon">
+                                </span>
+                                <dfn>{{ showPublicationDetails.details.name }}</dfn>
+                            </div>
+                            <div class="close-icon cursor-pointer" (click)="onCloseDetails()">
+                            <span>
+                                <img src="/assets/svgs/close-icon.svg" alt="" class="static-icon">
+                                <img src="/assets/svgs/close-icon-white.svg" alt="" class="dark-active">
+                            </span>
+                            </div>
+                        </div>
+                        <div class="information">
+                            <div class="info-item w-100">
+                            <span>
+                                <img src="/assets/svgs/calendar-ic.svg" alt="" class="static-icon">
+                                <img src="/assets/svgs/calendar-ic-white.svg" alt="" class="dark-active">
+                            </span>
+                                <div class="article-info">
+                                    <p>Created on</p>
+                                    <h4>{{ showPublicationDetails.details.created_date }}</h4>
+                                </div>
+                            </div>
+                            <div class="info-item w-100">
+                            <span>
+                                <img src="/assets/svgs/clock-ic.svg" alt="" class="static-icon">
+                                <img src="/assets/svgs/close-icon-white.svg" alt="" class="dark-active">
+                            </span>
+                                <div class="article-info">
+                                    <p>Last updated</p>
+                                    <h4>{{ showPublicationDetails.details.updated_date }}</h4>
+                                </div>
+                            </div>
+                            <div class="info-item w-100">
+                            <span>
+                                <img src="/assets/svgs/user-ic.svg" alt="" class="static-icon">
+                                <img src="/assets/svgs/user-ic-white.svg" alt="" class="dark-active">
+                            </span>
+                                <div class="article-info">
+                                    <p>Created by</p>
+                                    <h4>{{ showPublicationDetails.details.created_by }}</h4>
+                                </div>
+                            </div>
+                            <div class="info-item w-100">
+                            <span>
+                                <img src="/assets/svgs/user-ic.svg" alt="" class="static-icon">
+                                <img src="/assets/svgs/user-ic-white.svg" alt="" class="dark-active">
+                            </span>
+                                <div class="article-info">
+                                    <p>Updated by</p>
+                                    <h4>{{ showPublicationDetails.details.updated_by }}</h4>
+                                </div>
+                            </div>
+                            <div class="info-item w-100">
+                            <span>
+                                <img src="/assets/svgs/diagram-icon-small.svg" alt="" class="static-icon">
+                                <img src="/assets/svgs/diagram-icon-small-red.svg" alt="" class="dark-active">
+                            </span>
+                                <div class="article-info">
+                                    <p>Home Diagram</p>
+                                    <h4>{{ showPublicationDetails.details.diagram_name }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content-details" [ngClass]="{'list-view': defaultListTab == 'list'}">
+            <div class="row m-0">
+                <div class="col-12 px-0 data-nav" *ngIf="defaultListTab == 'list'">
+                    <table class="table">
+                        <thead class="list-item list-heading">
+                            <tr class="data-highlight-info">
+                                <th style="padding-left: 0px;">
+                                    <div class="d-flex align-items-center">
+                                        <div class="check-wrap">
+                                            <input type="checkbox" id="select-all" (change)="selectAllRecords($event)" [checked]="isAllReSelected">
+                                            <label for="select-all"></label>
+                                        </div>
+                                    <div (click)="sortBy('name')" class="cursor-pointer" style="padding-left: 24px;">
+                                        Name
+                                        <button class="btn btn-sort">
+                                            <img src="/assets/svgs/chevron-up-ic.svg" *ngIf="defaultSort == 'name_asc'">
+                                            <img src="/assets/svgs/chevron-down-ic.svg" *ngIf="defaultSort == 'name_desc'">
+                                        </button>
+                                    </div>
+                                    </div>
+                                </th>
+                                <th class="created-on cursor-pointer" (click)="sortBy('created')">
+                                    Created On
+                                    <button class="btn btn-sort">
+                                        <img src="/assets/svgs/chevron-down-ic.svg" *ngIf="defaultSort == 'created_date_desc'">
+                                        <img src="/assets/svgs/chevron-up-ic.svg" *ngIf="defaultSort == 'created_date_asc'">
+                                    </button>
+                                </th>
+                                <th class="last-updated cursor-pointer" (click)="sortBy('updated')">
+                                    Updated On
+                                    <button class="btn btn-sort">
+                                        <img src="/assets/svgs/chevron-down-ic.svg" *ngIf="defaultSort == 'updated_date_desc'">
+                                        <img src="/assets/svgs/chevron-up-ic.svg" *ngIf="defaultSort == 'updated_date_asc'">
+                                    </button>
+                                </th>
+                                <th class="created-by cursor-pointer" (click)="sortBy('created_by')">
+                                    Created By
+                                    <button class="btn btn-sort">
+                                        <img src="/assets/svgs/chevron-down-ic.svg" *ngIf="defaultSort == 'created_by_desc'">
+                                        <img src="/assets/svgs/chevron-up-ic.svg" *ngIf="defaultSort == 'created_by_asc'">
+                                    </button>
+                                </th>
+                                <th class="created-on cursor-pointer" (click)="sortBy('updated_by')">
+                                    Last Updated By
+                                    <button class="btn btn-sort">
+                                        <img src="/assets/svgs/chevron-down-ic.svg" *ngIf="defaultSort == 'updated_by_desc'">
+                                        <img src="/assets/svgs/chevron-up-ic.svg" *ngIf="defaultSort == 'updated_by_asc'">
+                                    </button>
+                                </th>
+                                <ng-container *ngIf="mode == 'manage'">
+                                    <th></th>
+                                </ng-container>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="list-item" *ngFor="let item of publications" (contextmenu)="onPublicationOptions($event, item, true)">
+                                <td class="data-call">
+                                    <div class="d-flex align-items-center">
+                                        <div class="check-wrap">
+                                            <input type="checkbox" [id]="'attribute_type_item_' + item.id" (change)="checkPublicationItem($event, item)" [checked]="publicationCheckedItems[item.id]">
+                                            <label [for]="'attribute_type_item_' + item.id"></label>
+                                        </div>
+                                        <div class="title-holder d-flex align-items-center w-100">
+                                            <span class="cursor-pointer" [routerLink]="generatePublicationURL(item.id)">
+                                                <img class="static-icon" src="/assets/svgs/file-text-ic.svg" alt="File text icon">
+                                                <img class="dark-active" src="/assets/svgs/file-text-ic-red.svg" alt="File text icon red">
+                                            </span>
+                                            <ng-container *ngIf="renamePublicationData.id !== item.id">
+                                                <dfn [routerLink]="generatePublicationURL(item.id)" class="cursor-pointer">
+                                                    {{ item.name }}
+                                                </dfn>
+                                            </ng-container>
+                                            <div class="form-group w-100" *ngIf="renamePublicationData.id == item.id">
+                                                <input type="text" class="form-control" [id]="'rename_' + item.id" [value]="item.name" (keyup)="onRenameKeyup($event, item)">
+                                            </div>
+                                        </div>
+                                        <a target="_blank" [routerLink]="'/publications/viewer/' + item.id" *ngIf="renamePublicationData.id !== item.id" class="text-decoration-underline float-right">Launch</a>
+                                    </div>
+                                </td>
+                                <td class="created-on cursor-pointer" [routerLink]="generatePublicationURL(item.id)">{{ item.created_date }}</td>
+                                <td class="last-updated cursor-pointer" [routerLink]="generatePublicationURL(item.id)">{{ item.updated_date }}</td>
+                                <td class="created-by cursor-pointer" [routerLink]="generatePublicationURL(item.id)">{{ item.created_by }}</td>
+                                <td class="created-on cursor-pointer" [routerLink]="generatePublicationURL(item.id)">{{ item.updated_by }}</td>
+                                <ng-container *ngIf="mode == 'manage'">
+                                    <td>
+                                        <div class="float-right position-relative">
+                                            <div class="action-hold d-flex align-items-center" [ngClass]="{'options-shown': publicationExpandOptions.id == item.id && publicationExpandOptions.type == 'fixed'}">
+                                                <button class="more-btn action-btn" [ngClass]="{'active': publicationExpandOptions.id == item.id}" (click)="onPublicationOptions($event, item, false)">
+                                                    <img src="/assets/svgs/more-vertical-ic-2.svg" alt="More icon">
+                                                </button>
+                                                <div class="dropdown-wrap">
+                                                    <div class="dropdown-info">
+                                                        <button (click)="renamePublication(item)">Rename</button>
+                                                        <button (click)="deletePublication(item)">Delete</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <div class="float-right position-relative" style="{{ publicationExpandOptions.id == item.id && publicationExpandOptions.type == 'float' ? 'right:' + publicationExpandOptions.right + 'px;' : '' }}">
+                                        <div class="action-hold d-flex align-items-center" [ngClass]="{'options-shown float-menu-no-box': publicationExpandOptions.id == item.id && publicationExpandOptions.type == 'float'}">
+                                            <div class="dropdown-wrap">
+                                                <div class="dropdown-info">
+                                                    <button (click)="renamePublication(item)">Rename</button>
+                                                    <button (click)="deletePublication(item)">Delete</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <ng-container *ngIf="defaultListTab == 'box'">
+                    <ng-container *ngIf="hasPublications === true">
+                    <div class="col-md-3 col-sm-6 mb-3 cursor-pointer" *ngFor="let item of publications" [routerLink]="generatePublicationViewerUrl(item)">
+                        <div class="publication-container">
+                            <a class="publication-item display-block" >
+                                <div class="mb-4 svg-parent" style="height: 100%; width: 100%;">
+                                    <div class="responsive-svg" *ngIf="item.svg" [innerHTML]="onDisplaySVG(item.svg)" style="height: 100%; width: 100%;"></div>
+                                    <div *ngIf="!item.svg">
+                                        <img style="width:50%; max-height: 150px;" src="/assets/png/ei-big.png">
+                                        <div style="margin-top: 20px; font-weight: 700;">No Homepage</div>
+                                    </div>
+                                </div>
+                            </a>
+                            <span class="text-bold">{{ item.name }}</span>
+                        </div>
+                    </div>
+                </ng-container>
+                    <ng-container *ngIf="hasPublications === false">
+                        <div  class="col-12 no-home">
+                            
+                          <img src="/assets/png/ei-big.png" />  
+                          <h1 class="text-bold" style="color: rgb(172, 172, 172);" >No Homepage</h1>
+                        
+                        </div>
+                      </ng-container>
+                </ng-container>
+            </div>
+            <div class="load-more-wrap" *ngIf="currentPage && currentPage < pages">
+                <section *ngIf="isLoadingPublications" class="mt-1">
+                    <img src="/assets/img/loader.gif" class="w24 vertical-align-middle mr-1">
+                    <b>Loading</b>
+                </section>
+                <button class="btn" (click)="loadPublications(currentPage + 1)" *ngIf="!isLoadingPublications">Load more</button>
+            </div>
+        </div>
+    </div>
+    <ng-template #confirmDeletePublicationItemModal let-modal>
+        <div class="modal-header">
+            <h4 class="modal-title text-center">
+                Confirmation Required
+            </h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('dismiss')">
+            <span aria-hidden="true">
+                <img src="/assets/svgs/modal-x-ic.svg" alt="X icon">
+            </span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                Are you sure you want to delete following item(s)?
+                <ul class="mt-2 list-unstyled">
+                    <ng-container *ngIf="!deleteSingleItem">
+                        <li class="mb-1" *ngFor="let item of publicationCheckedItems | keyvalue; let index = index;">
+                            <div class="folder-model-box-sm">
+                                <span class="text-bold text-dark">
+                                    {{ item.value.name }}
+                                </span>
+                            </div>
+                        </li>
+                    </ng-container>
+                    <li class="mb-1" *ngIf="deleteSingleItem">
+                        <div class="folder-model-box-sm">
+                            <span class="text-bold text-dark">
+                                {{ deleteSingleItemData.name }}
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+            <div class="row row-cols-1 row-cols-sm-2 no-gutters m-0">
+                <div class="col pr-sm-2">
+                    <button type="button" class="btn transparent-btn w-100" data-dismiss="modal" (click)="modal.dismiss('dismiss')">No</button>
+                </div>
+                <div class="col pl-sm-2">
+                    <button type="button" class="btn btn-red w-100" (click)="processPublicationDelete()">Yes</button>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</ng-container>

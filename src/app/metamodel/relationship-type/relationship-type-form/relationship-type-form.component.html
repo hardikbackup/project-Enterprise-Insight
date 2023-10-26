@@ -1,0 +1,268 @@
+<app-master-layout></app-master-layout>
+<div class="content-wrapper types-editor relationship-types-2">
+    <form [formGroup]="form" (ngSubmit)="onRelationshipTypeUpdate()">
+        <div class="content-wrapper__data-title">
+            <div class="row data-highlight d-flex align-items-center m-0">
+                <div class="title-holder col-lg-auto col-12 col-sm-6 col-md-12 d-flex align-items-center p-0">
+                    <a class="btn back-btn" routerLink="/metamodel/relationship-type">
+                        <img class="default-icon" src="/assets/svgs/arrow-left-ic.svg" alt="Left arrow">
+                        <img class="hover-icon" src="/assets/svgs/arrow-left-ic-red.svg" alt="Left arrow red">
+                    </a>
+                    <h3>Relationship Type Editor</h3>
+                </div>
+                <div class="btn-wrapper action-triger-wrap transparent-btn btn__inline d-flex align-items-center col-lg-auto col-12 col-sm-6 col-md-12 mt-3 mt-sm-0 mt-md-4 mt-lg-0 p-0 ml-sm-auto">
+                    <button type="button" class="btn ml-sm-auto ml-md-0 ml-lg-auto transparent-btn" routerLink="/metamodel/relationship-type" *ngIf="!isLoading">
+                        <img src="/assets/svgs/discard-trash-ic.svg" alt="Trash icon" class="icon">
+                        Discard
+                    </button>
+                    <button type="submit" class="btn transparent-btn fill" *ngIf="!isLoading">
+                        <img src="/assets/svgs/save-ic-white.svg" alt="Save icon" class="icon">
+                        Save
+                    </button>
+                    <div *ngIf="isLoading">
+                        <img src="/assets/img/loader.gif" class="w24">
+                        Processing your request
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="type-editor-content tween-col">
+            <div class="row">
+                <div class="col-12">
+                    <div class="item-nav">
+                        <a class="cursor-pointer" [ngClass]="{'active': currentActiveTab == 'object_types'}" (click)="onTabChange('object_types')">Object Type Combinations</a>
+                        <a class="cursor-pointer" [ngClass]="{'active': currentActiveTab == 'attribute_types'}" (click)="onTabChange('attribute_types')">Attributes</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row no-gutters">
+                <div class="col-12 options-col" [ngClass]="{'col-lg-auto': currentActiveTab == 'object_types' }">
+                    <div class="options-wrap">
+                        <section [ngClass]="{'display-hidden': currentActiveTab != 'object_types'}">
+                            <div class="header">
+                                <div class="row no-gutters">
+                                    <div class="col-auto relationship-type-name">
+                                        <div class="form-group">
+                                            <label for="name">Relationship Type Name</label>
+                                            <input type="text" class="form-control" formControlName="name" id="name">
+                                            <span class="position-absolute red" *ngIf="hasFormSubmitted && !form.controls.name.valid">Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="form-group">
+                                            <label for="from_to_description">From - To Description</label>
+                                            <input type="text" class="form-control" formControlName="from_to_description" id="from_to_description" (keyup)="onFromToDescriptionChange($event)">
+                                            <span class="position-absolute red" *ngIf="hasFormSubmitted && !form.controls.from_to_description.valid">Required</span>
+                                        </div>
+                                    </div>
+                                    <span class="seperator"></span>
+                                    <div class="col-auto">
+                                        <div class="form-group">
+                                            <label for="from_to_description">To - From Description</label>
+                                            <input type="text" class="form-control" formControlName="to_from_description" id="to_from_description" [readOnly]="hasBIDirectionalRelationship">
+                                            <span class="position-absolute red" *ngIf="hasFormSubmitted && !form.controls.to_from_description.valid">Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-auto arrows-container">
+                                        <div class="form-group cursor-pointer" (click)="onExpandLineDropdown('start')">
+                                            <label for="from_to_description">Start Line</label>
+                                            <div class="tols-btn dropdown" [ngClass]="{'dropdown-expanded position-static': startEndLineExpandType == 'start'}">
+                                                <button type="button" class="d-flex align-items-center text-left">
+                                                    <ng-container *ngIf="startLine">
+                                                        <div class="mxgraph-line margin-unset mt-2" [ngClass]="getStartLineClass()"></div>
+                                                    </ng-container>
+                                                    <ng-container *ngIf="!startLine">
+                                                        None
+                                                    </ng-container>
+                                                    <i class="arrow">
+                                                        <img src="/assets/svgs/chevron-down-ic.svg" alt="Arrow" [ngClass]="{'display-hidden': startEndLineExpandType == 'start'}">
+                                                        <img src="/assets/svgs/chevron-up-ic.svg" alt="Arrow" [ngClass]="{'display-hidden': startEndLineExpandType != 'start'}">
+                                                    </i>
+                                                </button>
+                                                <div class="dropdown-menu mxgraph-options mt-2">
+                                                    <div class="options-group">
+                                                        <div class="check-wrap label-text cursor-pointer no-line-cell" (click)="onStartLineSelect(null)">
+                                                            <div class="p-2"></div>
+                                                        </div>
+                                                        <div *ngFor="let item of startLinesList | keyvalue" class="check-wrap label-text cursor-pointer" (click)="onStartLineSelect(item.value.id)">
+                                                            <div>
+                                                                <div class="mxgraph-line" [ngClass]="item.value.class"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="seperator no-bg"></span>
+                                    <div class="col-auto arrows-container">
+                                        <div class="form-group cursor-pointer" (click)="onExpandLineDropdown('end')">
+                                            <label for="from_to_description">End Line</label>
+                                            <div class="tols-btn dropdown" [ngClass]="{'dropdown-expanded position-static': startEndLineExpandType == 'end'}">
+                                                <button type="button" class="d-flex align-items-center text-left">
+                                                    <ng-container *ngIf="endLine">
+                                                        <div class="mxgraph-line margin-unset mt-2" [ngClass]="getEndLineClass()"></div>
+                                                    </ng-container>
+                                                    <ng-container *ngIf="!endLine">
+                                                        None
+                                                    </ng-container>
+                                                    <i class="arrow">
+                                                        <img src="/assets/svgs/chevron-down-ic.svg" alt="Arrow" [ngClass]="{'display-hidden': startEndLineExpandType == 'end'}">
+                                                        <img src="/assets/svgs/chevron-up-ic.svg" alt="Arrow" [ngClass]="{'display-hidden': startEndLineExpandType != 'end'}">
+                                                    </i>
+                                                </button>
+                                                <div class="dropdown-menu mxgraph-options mt-2">
+                                                    <div class="options-group">
+                                                        <div class="check-wrap label-text cursor-pointer no-line-cell" (click)="onEndLineSelect(null)">
+                                                            <div class="p-2"></div>
+                                                        </div>
+                                                        <div *ngFor="let item of endLinesList | keyvalue" class="check-wrap label-text cursor-pointer" (click)="onEndLineSelect(item.value.id)">
+                                                            <div>
+                                                                <div class="mxgraph-line" [ngClass]="item.value.class"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="w-100 bg-none row p-3">
+                                        <div class="form-group">
+                                            <div class="custom-control custom-switch">
+                                                <input type="checkbox" formControlName="bi_directional_relationship" class="custom-control-input" id="bi_directional_relationship" (change)="onBIDirectionalChange($event)">
+                                                <label class="custom-control-label" for="bi_directional_relationship"></label>
+                                                <span class="ml-2 position-relative top-6">Bi-directional relationship</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="body">
+                                <app-relationship-object-search (exportObjectSelection)="onObjectFromToSelected($event)"></app-relationship-object-search>
+                            </div>
+                        </section>
+                        <section [ngClass]="{'display-hidden': currentActiveTab != 'attribute_types'}">
+                            <div class="body" *ngIf="firstLoad">
+                                <div class="col-12">
+                                    <div class="form-group input-field mt-2">
+                                        <label for="add_list_option">Tab Name</label>
+                                        <input type="text" id="add_list_option" class="form-control list-option" (keydown.enter)="onAddTab(); $event.preventDefault()" #tabNameEl>
+                                        <a class="submit-option submit-option-btn text-center cursor-pointer" (click)="onAddTab()">
+                                            <img src="/assets/svgs/Union.svg" alt="Arrow right gray" class="icon-gray">
+                                        </a>
+                                    </div>
+                                    <h5>List Tabs</h5>
+                                    <ul class="list-unstyled" *ngIf="attributeTabs.length">
+                                        <li *ngFor="let item of attributeTabs; let index = index">
+                                            <div class="form-wrap mb-3">
+                                                <div class="check-wrap radio-item label-text">
+                                                    <input type="checkbox" [id]="'tab_' + index" [checked]="selectedAttributeTabIndex == index" (change)="onAttributeTabChange($event, index)">
+                                                    <label [for]="'tab_' + index">
+                                                        <p class="lead-text text-transform-initial">
+                                                            {{ item.name }}
+                                                            <a class="float-right" (click)="onRemoveTab(index)">
+                                                                <img src="/assets/svgs/close-icon-gray.svg" class="w18" alt="Close icon">
+                                                            </a>
+                                                        </p>
+                                                    </label>
+                                                    <div class="checkbox"></div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <span *ngIf="!attributeTabs.length">No tabs available</span>
+                                    <app-dual-list-box *ngIf="selectedAttributeTabIndex != -1" [available_label]="'Attributes Available'" [selected_label]="'Attributes Assigned'" [available_types]="availableAttributeTypes" [selected_types]="preSelectedAttributeTypes" [leftScrollbarClass]="'relationship-type-scrollable-left'" [rightScrollbarClass]="'relationship-type-scrollable-right'" (exportSelectedTypes)="exportSelectedTypes($event)"></app-dual-list-box>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-auto options-col combination-col dual-list-box" [ngClass]="{'display-hidden': currentActiveTab != 'object_types'}">
+                    <div class="order-btn-wrap">
+                        <button class="btn btn-prev" type="button" (click)="onDeleteCombination()">
+                            <img src="/assets/svgs/arrow-left-ic-sm.svg" alt="Arrow left small" class="gray-icon">
+                            <img src="/assets/svgs/arrow-left-ic-sm-red.svg" alt="Arrow left small" class="red-icon">
+                        </button>
+                        <button class="btn btn-next" type="button" (click)="onCreateCombination()">
+                            <img src="/assets/svgs/arrow-right-ic-sm.svg" alt="Arrow right small" class="gray-icon">
+                            <img src="/assets/svgs/arrow-right-ic-sm-red.svg" alt="Arrow right small red" class="red-icon">
+                        </button>
+                    </div>
+                    <div class="options-wrap dual-list-box">
+                        <span>Combination</span>
+                        <div class="combination-info">
+                            <div class="scrollable-area ov-x-hidden"  style="max-height: calc(100vh - 133px);">
+                                <table class="table table-borderless">
+                                    <thead>
+                                        <tr>
+                                            <th  style="width: 168px;">
+                                                <div class="form-wrap">
+                                                    <div class="check-wrap label-text">
+                                                        <input type="checkbox" id="all_combinations" (change)="onCheckAllCombinations($event)" [checked]="allCombinationsSelected ? true : false">
+                                                        <label style="color: #5F6079;" for="all_combinations">From</label>
+                                                        <div class="checkbox"></div>
+                                                    </div>
+                                                </div>
+                                            </th>
+                                            <th style="width: 127px;">From > To Desc.</th>
+                                            <th style="width: 142px;">To</th>
+                                            <th class="option-item">A-B</th>
+                                            <th class="option-item">B-A</th>
+                                            <th class="option-item">BOTH</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let item of combinations | keyvalue, let i = index">
+                                            <td>
+                                                <div class="form-wrap">
+                                                    <div class="check-wrap label-text">
+                                                        <input type="checkbox" [id]="'checkbox_' + item.key" (change)="onCombinationSelect($event, item.key)" [checked]="hasCombinationChecked(item.key)">
+                                                        <label [for]="'checkbox_' + item.key" [title]="item.value.from_object_type.id == 'any' ? 'ANY' : item.value.from_object_type.name" style="font-weight: normal;"> {{ item.value.from_object_type.id == 'any' ? 'ANY' : item.value.from_object_type.name }}</label>
+                                                        <div class="checkbox"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-group mb-0">
+                                                    <input type="text" placeholder="Rel. From > To Desc." [title]="item.value.description" [id]="'combination_' + item.key" [value]="item.value.description">
+                                                </div>
+                                            </td>
+                                            <td style="color: #82839c" [title]="item.value.to_object_type.id == 'any' ? 'ANY' : item.value.to_object_type.name">
+                                                {{ item.value.to_object_type.id == 'any' ? 'ANY' : item.value.to_object_type.name }}
+                                            </td>
+                                            <td class="option-item">
+                                                <div class="form-wrap containment-item">
+                                                    <div class="check-wrap radio-item label-text">
+                                                        <input type="radio" [name]="'containment_' + i" value="from_to" [checked]="item.value.containment == 'from_to'" (click)="onContainmentCheck($event, item.value, 'from_to')">
+                                                        <div class="checkbox"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="option-item">
+                                                <div class="form-wrap containment-item">
+                                                    <div class="check-wrap radio-item label-text">
+                                                        <input type="radio" [name]="'containment_' + i" value="to_from" [checked]="item.value.containment == 'to_from'" (click)="onContainmentCheck($event, item.value, 'to_from')">
+                                                        <div class="checkbox"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="option-item">
+                                                <div class="form-wrap containment-item">
+                                                    <div class="check-wrap radio-item label-text">
+                                                        <input type="radio" [name]="'containment_' + i" value="both" [checked]="item.value.containment == 'both'" (click)="onContainmentCheck($event, item.value, 'both')">
+                                                        <div class="checkbox"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

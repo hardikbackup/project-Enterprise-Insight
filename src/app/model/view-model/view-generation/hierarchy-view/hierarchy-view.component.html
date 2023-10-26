@@ -1,0 +1,13 @@
+<ng-container>
+    <div class="component-box {{ 'hierarchy-child-' + totalSubs }}" [id]="'hierarchy_object_' + parentId + '_' + item.id" [ngClass]="[level > 0 && item.total_nested > 0 ? 'inner-box-group' : '', item.is_round_corners ? 'br-5' : 'br-0']" [ngStyle]="{'background-color': item.shape_type_color}">
+        <span [ngStyle]="{'color': item.shape_type_text_color}">
+            {{ item.name }}
+        </span>
+        <i class="icon" *ngIf="item.shape_icon">
+            <img [src]="getShapeIconImage(item)">
+        </i>
+        <ng-container *ngIf="item.items && item.items.length">
+            <app-hierarchy-view class="app-h-v" [ngClass]="{'single-col': child_item.value.first_layer_subs <= 3, 'double-col': child_item.value.first_layer_subs > 3 && child_item.value.first_layer_subs < 6, 'large-col': child_item.value.first_layer_subs > 6}" *ngFor="let child_item of item.items | keyvalue" [item]="child_item.value" [level]="level + 1" [parentId]="item.id"></app-hierarchy-view>
+        </ng-container>
+    </div>
+</ng-container>

@@ -1,0 +1,440 @@
+<app-master-layout></app-master-layout>
+<div class="content-wrapper object-types-contents">
+  <ng-container *ngIf="adminUser">
+    <div class="content-wrapper__data-title">
+      <div class="row data-highlight d-flex align-items-center m-0">
+        <div
+          class="title-holder col-lg-auto col-6 d-flex align-items-center p-0"
+        >
+          <span>
+            <img class="default-icon" src="/assets/svgs/repeat-ic.svg" />
+            <img class="hover-icon" src="/assets/svgs/repeat-ic-red.svg" />
+          </span>
+          <h3>Data Connectors</h3>
+        </div>
+        <div
+          class="btn-wrapper action-triger-wrap btn__inline col-lg-auto col-6 col-md-12 mt-sm-3 mt-md-4 mt-lg-0 d-flex justify-content-xl-end p-0 ml-auto"
+        >
+          <a
+            *ngIf="getTotalSelectedConnectors()"
+            (click)="onDeleteMultipleConnectors()"
+            class="btn transparent-btn medium ml-0"
+          >
+            <span class="icon-wrap">
+              <img
+                class="default-icon"
+                src="/assets/svgs/trash-ic.svg"
+                alt="Trash icon"
+              />
+              <img
+                class="dark-active"
+                src="/assets/svgs/trash-ic-white.svg"
+                alt="Trash icon Red"
+              />
+            </span>
+            <dfn class="d-none d-md-block">
+              Delete Selected ({{ getTotalSelectedConnectors() }})
+            </dfn>
+          </a>
+          <a
+            routerLink="/data-connectors/add"
+            class="btn transparent-btn medium"
+          >
+            <span class="icon-wrap">
+              <img
+                class="default-icon"
+                src="/assets/svgs/plus-ic.svg"
+                alt="Plus icon "
+              />
+              <img
+                class="dark-active"
+                src="/assets/svgs/plus-ic-white.svg"
+                alt="Plus icon Red"
+              />
+            </span>
+            <span class="d-md-none icon-wrap">
+              <img
+                class="default-icon"
+                src="/assets/svgs/object-type-layers-ic.svg"
+                alt="folder icon "
+              />
+              <img
+                class="dark-active"
+                src="/assets/svgs/object-type-layers-ic-red.svg"
+                alt="folder icon "
+              />
+            </span>
+            <dfn class="d-none d-md-block">Create API Client</dfn>
+          </a>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <div class="content-details list-view">
+    <div class="type-editor-content tween-col">
+      <div class="row">
+        <div class="col-12">
+          <div class="item-nav">
+            <ng-container *ngIf="adminUser">
+              <a routerLink="/data-connectors" class="active cursor-pointer"
+                >API Clients</a
+              >
+            </ng-container>
+            <a routerLink="/data-connectors/excel" class="cursor-pointer"
+              >Excel</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <ng-container *ngIf="adminUser">
+      <div class="row m-0">
+        <div class="col-12 px-0 data-nav">
+          <ng-container *ngIf="currentActiveTab == 'api_clients'">
+            <table class="table">
+              <thead class="list-item list-heading">
+                <tr class="data-highlight-info">
+                  <th style="padding-left: 0px">
+                    <div class="d-flex align-items-center">
+                      <div class="check-wrap">
+                        <input
+                          type="checkbox"
+                          id="select-all"
+                          (change)="selectAllRecords($event)"
+                          [checked]="isAllReSelected"
+                        />
+                        <label for="select-all"></label>
+                      </div>
+                      <div
+                        (click)="sortBy('name')"
+                        class="cursor-pointer"
+                        style="padding-left: 24px"
+                      >
+                        Name
+                        <button class="btn btn-sort">
+                          <img
+                            src="/assets/svgs/chevron-up-ic.svg"
+                            *ngIf="defaultSort == 'name_asc'"
+                          />
+                          <img
+                            src="/assets/svgs/chevron-down-ic.svg"
+                            *ngIf="defaultSort == 'name_desc'"
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  </th>
+                  <th
+                    class="created-on cursor-pointer"
+                    (click)="sortBy('created')"
+                  >
+                    Created On
+                    <button class="btn btn-sort">
+                      <img
+                        src="/assets/svgs/chevron-down-ic.svg"
+                        *ngIf="defaultSort == 'created_date_desc'"
+                      />
+                      <img
+                        src="/assets/svgs/chevron-up-ic.svg"
+                        *ngIf="defaultSort == 'created_date_asc'"
+                      />
+                    </button>
+                  </th>
+                  <th
+                    class="last-updated cursor-pointer"
+                    (click)="sortBy('updated')"
+                  >
+                    Updated On
+                    <button class="btn btn-sort">
+                      <img
+                        src="/assets/svgs/chevron-down-ic.svg"
+                        *ngIf="defaultSort == 'updated_date_desc'"
+                      />
+                      <img
+                        src="/assets/svgs/chevron-up-ic.svg"
+                        *ngIf="defaultSort == 'updated_date_asc'"
+                      />
+                    </button>
+                  </th>
+                  <th
+                    class="created-by cursor-pointer"
+                    (click)="sortBy('created_by')"
+                  >
+                    Created By
+                    <button class="btn btn-sort">
+                      <img
+                        src="/assets/svgs/chevron-down-ic.svg"
+                        *ngIf="defaultSort == 'created_by_desc'"
+                      />
+                      <img
+                        src="/assets/svgs/chevron-up-ic.svg"
+                        *ngIf="defaultSort == 'created_by_asc'"
+                      />
+                    </button>
+                  </th>
+                  <th
+                    class="created-on cursor-pointer"
+                    (click)="sortBy('updated_by')"
+                  >
+                    Last Updated By
+                    <button class="btn btn-sort">
+                      <img
+                        src="/assets/svgs/chevron-down-ic.svg"
+                        *ngIf="defaultSort == 'updated_by_desc'"
+                      />
+                      <img
+                        src="/assets/svgs/chevron-up-ic.svg"
+                        *ngIf="defaultSort == 'updated_by_asc'"
+                      />
+                    </button>
+                  </th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  class="list-item"
+                  *ngFor="let item of data_connectors"
+                  (contextmenu)="onConnectorOptions($event, item, true)"
+                >
+                  <td class="data-call">
+                    <div class="d-flex align-items-center">
+                      <div class="check-wrap">
+                        <input
+                          type="checkbox"
+                          [id]="'connector_' + item.id"
+                          (change)="checkConnectorItem($event, item)"
+                          [checked]="connectorCheckedItems[item.id]"
+                        />
+                        <label [for]="'connector_' + item.id"></label>
+                      </div>
+                      <div class="title-holder d-flex align-items-center w-100">
+                        <span
+                          class="cursor-pointer"
+                          [routerLink]="'/data-connectors/' + item.id + '/edit'"
+                        >
+                          <img
+                            class="static-icon"
+                            src="/assets/svgs/repeat-ic.svg"
+                            alt="Layer icon"
+                          />
+                          <img
+                            class="dark-active"
+                            src="/assets/svgs/repeat-ic-red.svg"
+                            alt="Layer icon red"
+                          />
+                        </span>
+                        <ng-container
+                          *ngIf="renameConnectorData.id !== item.id"
+                        >
+                          <dfn
+                            [routerLink]="
+                              '/data-connectors/' + item.id + '/edit'
+                            "
+                            class="cursor-pointer"
+                          >
+                            {{ item.name }}
+                          </dfn>
+                        </ng-container>
+                        <div
+                          class="form-group w-100"
+                          *ngIf="renameConnectorData.id == item.id"
+                        >
+                          <input
+                            type="text"
+                            class="form-control"
+                            [id]="'rename_' + item.id"
+                            [value]="item.name"
+                            (keyup)="onRenameKeyup($event, item)"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td
+                    class="created-on cursor-pointer"
+                    [routerLink]="'/data-connectors/' + item.id + '/edit'"
+                  >
+                    {{ item.created_date }}
+                  </td>
+                  <td
+                    class="last-updated cursor-pointer"
+                    [routerLink]="'/data-connectors/' + item.id + '/edit'"
+                  >
+                    {{ item.updated_date }}
+                  </td>
+                  <td
+                    class="created-by cursor-pointer"
+                    [routerLink]="'/data-connectors/' + item.id + '/edit'"
+                  >
+                    {{ item.created_by }}
+                  </td>
+                  <td
+                    class="created-on cursor-pointer"
+                    [routerLink]="'/data-connectors/' + item.id + '/edit'"
+                  >
+                    {{ item.updated_by }}
+                  </td>
+                  <td>
+                    <div class="float-right position-relative">
+                      <div
+                        class="action-hold d-flex align-items-center"
+                        [ngClass]="
+                          connectorExpandOptions.id == item.id &&
+                          connectorExpandOptions.type == 'fixed'
+                            ? 'options-shown'
+                            : ''
+                        "
+                      >
+                        <button
+                          class="more-btn action-btn"
+                          [ngClass]="
+                            connectorExpandOptions.id == item.id ? 'active' : ''
+                          "
+                          (click)="onConnectorOptions($event, item, false)"
+                        >
+                          <img
+                            src="/assets/svgs/more-vertical-ic-2.svg"
+                            alt="More icon"
+                          />
+                        </button>
+                        <div class="dropdown-wrap">
+                          <div class="dropdown-info rightBoxHeight">
+                            <button (click)="renameObjectType(item)">
+                              Rename
+                            </button>
+                            <button (click)="deleteConnector(item)">
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <div
+                    class="float-right position-relative"
+                    style="{{
+                      connectorExpandOptions.id == item.id &&
+                      connectorExpandOptions.type == 'float'
+                        ? 'right:' + connectorExpandOptions.right + 'px;'
+                        : ''
+                    }}"
+                  >
+                    <div
+                      class="action-hold d-flex align-items-center"
+                      [ngClass]="
+                        connectorExpandOptions.id == item.id &&
+                        connectorExpandOptions.type == 'float'
+                          ? 'options-shown float-menu-no-box'
+                          : ''
+                      "
+                    >
+                      <div class="dropdown-wrap">
+                        <div class="dropdown-info rightBoxHeight">
+                          <button (click)="renameObjectType(item)">
+                            Rename
+                          </button>
+                          <button (click)="deleteConnector(item)">
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </tr>
+              </tbody>
+            </table>
+          </ng-container>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="currentActiveTab == 'api_clients'">
+      <div class="load-more-wrap" *ngIf="currentPage && currentPage < pages">
+        <section *ngIf="isLoadingConnectors" class="mt-1">
+          <img
+            src="/assets/img/loader.gif"
+            class="w24 vertical-align-middle mr-1"
+          />
+          <b>Loading</b>
+        </section>
+        <button
+          class="btn"
+          (click)="loadConnectors(currentPage + 1)"
+          *ngIf="!isLoadingConnectors"
+        >
+          Load more
+        </button>
+      </div>
+    </ng-container>
+  </div>
+</div>
+<ng-container *ngIf="adminUser">
+  <ng-template #confirmDeleteConnectorItemModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title text-center">Confirmation Required</h4>
+      <button
+        type="button"
+        class="close"
+        data-dismiss="modal"
+        aria-label="Close"
+        (click)="modal.dismiss('dismiss')"
+      >
+        <span aria-hidden="true">
+          <img src="/assets/svgs/modal-x-ic.svg" alt="X icon" />
+        </span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        Are you sure you want to delete following Data Connector(s)?
+        <ul class="mt-2 list-unstyled">
+          <ng-container *ngIf="!deleteSingleItem">
+            <li
+              class="mb-1"
+              *ngFor="
+                let item of connectorCheckedItems | keyvalue;
+                let index = index
+              "
+            >
+              <div class="folder-model-box-sm no-border">
+                <span class="text-bold text-dark">
+                  {{ item.value.name }}
+                </span>
+              </div>
+            </li>
+          </ng-container>
+          <li class="mb-1" *ngIf="deleteSingleItem">
+            <div class="folder-model-box-sm no-border">
+              <span class="text-bold text-dark">
+                {{ deleteSingleItemData.name }}
+              </span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="modal-footer justify-content-center">
+      <div class="row row-cols-1 row-cols-sm-2 no-gutters m-0">
+        <div class="col pr-sm-2">
+          <button
+            type="button"
+            class="btn transparent-btn w-100"
+            data-dismiss="modal"
+            (click)="modal.dismiss('dismiss')"
+          >
+            No
+          </button>
+        </div>
+        <div class="col pl-sm-2">
+          <button
+            type="button"
+            class="btn btn-red w-100"
+            (click)="processConnectorDelete()"
+          >
+            Yes
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</ng-container>

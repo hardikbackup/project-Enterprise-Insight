@@ -1,0 +1,136 @@
+
+<div class="row no-gutters dual-list-box" [style]="maxHeightStyle">
+  <div class="col-sm-6 col-12">
+    <p class="lead-text">{{ availableLabel }}</p>
+    <div
+      class="scrollable-area {{ leftScrollbarClass }}"
+      [style]="maxHeightStyle"
+    >
+    <div class="mt-4">
+      <div class="form-wrap" *ngFor="let item of getDualBoxAvailableTypes(); index as i">
+        <div class="check-wrap label-text">
+          <input
+            type="checkbox"
+            [checked] ="item.checked"
+            (change)="onDualListLeftItemSelect($event, item.id)"
+            [id]="'label' + item.id"
+          />
+          <label [for]="'label' + item.id">{{ item.name }}</label>
+          <div class="checkbox"></div>
+        </div>
+        <div *ngIf="isUserGroups && i>=0 && i==specialItemsCount-1">
+          <span>
+          <hr>
+          </span>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-12 assigned-values">
+    <span *ngIf="!displayAddRightContent">
+      <!-- <div class="order-btn-wrap d-sm-none">
+            <button class="btn btn-prev" (click)="onDualMoveItems('left')">
+                <img src="/assets/svgs/arrow-left-ic-sm.svg" alt="Arrow left small" class="gray-icon">
+                <img src="/assets/svgs/arrow-left-ic-sm-red.svg" alt="Arrow left small" class="red-icon">
+            </button>
+            <button class="btn btn-next move_right" (click)="onDualMoveItems('right')">
+                <img src="/assets/svgs/arrow-right-ic-sm.svg" alt="Arrow right small" class="gray-icon">
+                <img src="/assets/svgs/arrow-right-ic-sm-red.svg" alt="Arrow right small red" class="red-icon">
+            </button>
+        </div> -->
+      <p class="lead-text">{{ selectedLabel }}</p>
+      <div class="scrollable-area {{ rightScrollbarClass }}">
+        <div class="row" style="margin-left: 0; margin-right: 0">
+          <div class="col-sm-12">
+            <div
+              class="form-wrap"
+              *ngFor="let item of getDualBoxSelectedTypes()"
+            >
+              <div class="check-wrap label-text">
+                <input
+                  type="checkbox"
+                  (change)="onDualListRightItemSelect($event, item.id)"
+                  [id]="'label' + item.id"
+                />
+                <label [for]="'label' + item.id">
+                  {{ item.name }}
+                </label>
+                <div class="checkbox"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </span>
+    <div class="row" *ngIf="displayAddRightContent">
+      <div class="col-9">
+        <div class="d-flex flex-column">
+          <p class="lead-text">{{ selectedLabel }}</p>
+          <div class="scrollable-area ov-x-hidden{{ rightScrollbarClass }}">
+            <div
+              class="form-wrap"
+              *ngFor="let item of getDualBoxSelectedTypes()"
+            >
+              <div class="check-wrap label-text">
+                <input
+                  type="checkbox"
+                  (change)="onDualListRightItemSelect($event, item.id)"
+                  [id]="'label' + item.id"
+                />
+                <label [for]="'label' + item.id">
+                  {{ item.name }}
+                </label>
+                <div class="checkbox"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="d-flex flex-column d-flex align-items-end">
+            <p class="lead-text">Parent/Child</p>
+        </div>
+        <div class="d-flex flex-column d-flex align-items-center scrollable-area ov-x-hidden {{ rightScrollbarClass }}">
+          <ng-content select="[addition_right_content]"></ng-content>
+        </div>
+    </div>
+    </div>
+     <!-- <div class="order-btn-wrap d-sm-none d-sm-inline-block">
+      <button class="btn btn-prev" (click)="onDualMoveItems('left')">
+          <img src="/assets/svgs/arrow-left-ic-sm.svg" alt="Arrow left small" class="gray-icon">
+          <img src="/assets/svgs/arrow-left-ic-sm-red.svg" alt="Arrow left small" class="red-icon">
+      </button>
+      <button class="btn btn-next move_right" (click)="onDualMoveItems('right')">
+          <img src="/assets/svgs/arrow-right-ic-sm.svg" alt="Arrow right small" class="gray-icon">
+          <img src="/assets/svgs/arrow-right-ic-sm-red.svg" alt="Arrow right small red" class="red-icon">
+      </button>
+  </div>  -->
+  </div>
+</div>
+ <div class="order-btn-wrap d-none d-sm-inline-block">
+    <button class="btn btn-prev" type="button" (click)="onDualMoveItems('left')">
+      <img
+        src="/assets/svgs/arrow-left-ic-sm.svg"
+        alt="Arrow left small"
+        class="gray-icon"
+      />
+      <img
+        src="/assets/svgs/arrow-left-ic-sm-red.svg"
+        alt="Arrow left small"
+        class="red-icon"
+      />
+    </button>
+    <button class="btn btn-next" type="button" (click)="onDualMoveItems('right')">
+      <img
+        src="/assets/svgs/arrow-right-ic-sm.svg"
+        alt="Arrow right small"
+        class="gray-icon"
+      />
+      <img
+        src="/assets/svgs/arrow-right-ic-sm-red.svg"
+        alt="Arrow right small red"
+        class="red-icon"
+      />
+    </button>
+  </div>
